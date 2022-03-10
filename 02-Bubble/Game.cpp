@@ -26,14 +26,16 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
-	switch (key) 
+	switch (key)
 	{
-		case 27: bPlay = false;
+	case 27: bPlay = false;
 		break;
-		case 120: state = 1;
+	case 120: state = 1;
 		break;
-		default:
+	default:
+		break;
 	}
+
 	keys[key] = true;
 }
 
