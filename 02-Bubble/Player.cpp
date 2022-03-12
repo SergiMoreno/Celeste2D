@@ -99,7 +99,7 @@ void Player::update(int deltaTime)
 		posPlayer.y += FALL_STEP;
 		if(map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
 		{
-			if(Game::instance().getSpecialKey(GLUT_KEY_UP))
+			if(Game::instance().getKey(99))
 			{
 				bJumping = true;
 				jumpAngle = 0;
