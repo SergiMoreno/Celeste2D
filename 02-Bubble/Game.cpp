@@ -30,6 +30,7 @@ void Game::keyPressed(int key)
 	{
 	case 27: bPlay = false;
 		break;
+	case 88:
 	case 120: state = 1;
 		break;
 	default:

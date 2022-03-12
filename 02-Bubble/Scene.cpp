@@ -30,6 +30,15 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
+	/*spritesheet.loadFromFile("images/title.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1, 1), &spritesheet, &texProgram);
+	sprite->setNumberAnimations(1);
+
+	sprite->setAnimationSpeed(0, 8);
+	sprite->addKeyframe(0, glm::vec2(0.f, 0.f));
+	sprite->changeAnimation(0);
+	sprite->setPosition(glm::vec2(0.0, 0.0));*/
+
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	//map = TileMap::createTileMap("menu.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	player = new Player();
@@ -46,6 +55,9 @@ void Scene::update(int deltaTime, int state)
 		currentTime += deltaTime;
 		player->update(deltaTime);
 	}
+	else {
+		//sprite->update(deltaTime);
+	}
 }
 
 void Scene::render(int state)
@@ -61,6 +73,9 @@ void Scene::render(int state)
 		texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
 		map->render();
 		player->render();
+	}
+	else {
+		//sprite->render();
 	}
 }
 

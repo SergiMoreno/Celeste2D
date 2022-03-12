@@ -48,6 +48,7 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 
 void Player::update(int deltaTime)
 {
+	bool hasCollision = false;
 	sprite->update(deltaTime);
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
@@ -58,6 +59,7 @@ void Player::update(int deltaTime)
 		{
 			posPlayer.x += 2;
 			sprite->changeAnimation(STAND_LEFT);
+			hasCollision = true;
 		}
 	}
 	else if(Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
@@ -69,6 +71,7 @@ void Player::update(int deltaTime)
 		{
 			posPlayer.x -= 2;
 			sprite->changeAnimation(STAND_RIGHT);
+			hasCollision = true;
 		}
 	}
 	else
@@ -96,10 +99,13 @@ void Player::update(int deltaTime)
 	}
 	else
 	{
-		posPlayer.y += FALL_STEP;
+		if (hasCollision == true) {
+			posPlayer.y = posPlayer.y + FALL_STEP - 3;
+		} else posPlayer.y += FALL_STEP;
 		if(map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y))
 		{
-			if(Game::instance().getKey(99))
+			//if(Game::instance().getSpecialKey(GLUT_KEY_UP))
+			if (Game::instance().getKey('c') || Game::instance().getKey('C'))
 			{
 				bJumping = true;
 				jumpAngle = 0;
