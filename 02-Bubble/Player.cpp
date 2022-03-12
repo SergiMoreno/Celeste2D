@@ -76,10 +76,6 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 void Player::update(int deltaTime)
 {
 	bool hasCollision = false;
-	if (sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
-		sprite->changeAnimation(STAND_LEFT);
-	else if (sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
-		sprite->changeAnimation(STAND_RIGHT);
 	sprite->update(deltaTime);
 	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
@@ -105,17 +101,11 @@ void Player::update(int deltaTime)
 			hasCollision = true;
 		}
 	}
-	/*else if (Game::instance().getSpecialKey(GLUT_KEY_UP) && !bJumping) {
-		if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT)
-			sprite->changeAnimation(LOOK_LEFT_UP);
-		else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT)
-			sprite->changeAnimation(LOOK_RIGHT_UP);
-	}*/
-	else if (!bJumping)
+	else if (!bJumping) // doing nothing
 	{
-		if(sprite->animation() == MOVE_LEFT)
+		if(sprite->animation() == MOVE_LEFT || sprite->animation() == JUMPING_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
 			sprite->changeAnimation(STAND_LEFT);
-		else if(sprite->animation() == MOVE_RIGHT)
+		else if(sprite->animation() == MOVE_RIGHT || sprite->animation() == JUMPING_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
 			sprite->changeAnimation(STAND_RIGHT);
 	}
 	
@@ -143,6 +133,7 @@ void Player::update(int deltaTime)
 			if (Game::instance().getKey('c') || Game::instance().getKey('C'))
 			{
 				bJumping = true;
+				// start jumping
 				if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
 					sprite->changeAnimation(JUMPING_LEFT);
 				else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
@@ -162,14 +153,8 @@ void Player::update(int deltaTime)
 				else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_UP)
 					sprite->changeAnimation(LOOK_RIGHT_DOWN);
 			}
-			else {
-				if (sprite->animation() == JUMPING_LEFT)
-					sprite->changeAnimation(STAND_LEFT);
-				else if (sprite->animation() == JUMPING_RIGHT)
-					sprite->changeAnimation(STAND_RIGHT);
-			}
 		}
-		else {
+		else { // falling
 			if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
 				sprite->changeAnimation(JUMPING_LEFT);
 			else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
