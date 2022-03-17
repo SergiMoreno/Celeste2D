@@ -9,12 +9,19 @@
 #define JUMP_ANGLE_STEP 4
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4
+#define DASH_MOVEMENT 0
+#define DIV 2
 
 
 enum PlayerAnims
 {
 	STAND_LEFT, STAND_RIGHT, MOVE_LEFT, MOVE_RIGHT, LOOK_RIGHT_UP, LOOK_RIGHT_DOWN, LOOK_LEFT_UP, LOOK_LEFT_DOWN,
 	JUMPING_RIGHT, JUMPING_LEFT, DUSHING_RIGHT, DUSHING_LEFT
+};
+
+enum PlayerDirection
+{
+	UP, RIGHT_UP, RIGHT, RIGHT_DOWN, DOWN, LEFT_DOWN, LEFT, LEFT_UP
 };
 
 
@@ -26,6 +33,8 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	float dimy = 8.f / 48.f;
 	dimyPlayer = 28;
 	dimxPlayer = 28;
+	direction = RIGHT;
+	dashing_count = 0;
 	sprite = Sprite::createSprite(glm::ivec2(dimxPlayer, dimyPlayer), glm::vec2(dimx, dimy), &spritesheet, &shaderProgram);
 	sprite->setNumberAnimations(12);
 	
@@ -79,91 +88,212 @@ void Player::update(int deltaTime)
 {
 	bool hasCollision = false;
 	sprite->update(deltaTime);
-	if(Game::instance().getSpecialKey(GLUT_KEY_LEFT))
-	{
-		if(sprite->animation() != MOVE_LEFT)
-			sprite->changeAnimation(MOVE_LEFT);
-		posPlayer.x -= 2;
-		if(map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
-		{
-			posPlayer.x += 2;
-			sprite->changeAnimation(STAND_LEFT);
-			hasCollision = true;
+	if (bDashing) {
+		if (dashing_count == 0) {
+			dash_direction = direction;
+			dashing_count = 24;
+		}
+		else if (dashing_count != 1) {
+			--dashing_count;
+			switch (direction) {
+			case 0:		//UP
+				posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+					dashing_count = 1;
+				}
+				break;
+			case 1:		//RIGHT_UP
+				posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				}
+				posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				}
+				break;
+			case 2:		//RIGHT
+				posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+					dashing_count = 1;
+				}
+				break;
+			case 3:		//RIGHT_DOWN
+				posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveRight(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				}
+				posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+					posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				}
+				break;
+			case 4:		//DOWN
+				posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+					posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+					dashing_count = 1;
+				}
+				break;
+			case 5:		//LEFT_DOWN
+				posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveDown(posPlayer, glm::ivec2(32, 32), &posPlayer.y)) {
+					posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				}
+
+				posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				}
+				break;
+			case 6:		//LEFT
+				posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+					dashing_count = 1;
+				}
+				break;
+			case 7:		//LEFT_UP
+				posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveLeft(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				}
+				posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32))) {
+					posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				}
+				break;
+			}
 		}
 	}
-	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
-	{
-		if (sprite->animation() != MOVE_RIGHT)
-			sprite->changeAnimation(MOVE_RIGHT);
-		posPlayer.x += 2;
-		if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
+	if (dashing_count < 2) {
+		if (Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 		{
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				direction = LEFT_UP;
+			}
+			else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+				direction = LEFT_DOWN;
+			}
+			else {
+				direction = LEFT;
+			}
+			if (sprite->animation() != MOVE_LEFT)
+				sprite->changeAnimation(MOVE_LEFT);
 			posPlayer.x -= 2;
-			sprite->changeAnimation(STAND_RIGHT);
-			hasCollision = true;
+			if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
+			{
+				posPlayer.x += 2;
+				sprite->changeAnimation(STAND_LEFT);
+				hasCollision = true;
+			}
 		}
-	}
-	else if (!bJumping) // doing nothing
-	{
-		if(sprite->animation() == MOVE_LEFT || sprite->animation() == JUMPING_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
-			sprite->changeAnimation(STAND_LEFT);
-		else if(sprite->animation() == MOVE_RIGHT || sprite->animation() == JUMPING_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
-			sprite->changeAnimation(STAND_RIGHT);
-	}
-	
-	if(bJumping)
-	{
-		jumpAngle += JUMP_ANGLE_STEP;
-		if(jumpAngle == 180)
+		else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
 		{
-			bJumping = false;
-			posPlayer.y = startY;
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				direction = RIGHT_UP;
+			}
+			else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+				direction = RIGHT_DOWN;
+			}
+			else {
+				direction = RIGHT;
+			}
+			if (sprite->animation() != MOVE_RIGHT)
+				sprite->changeAnimation(MOVE_RIGHT);
+			posPlayer.x += 2;
+			if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
+			{
+				posPlayer.x -= 2;
+				sprite->changeAnimation(STAND_RIGHT);
+				hasCollision = true;
+			}
+		}
+		else if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+			direction = UP;
+		}
+		else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+			direction = DOWN;
+		}
+		else if (!bJumping) // doing nothing
+		{
+			if (sprite->animation() == MOVE_LEFT || sprite->animation() == JUMPING_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
+				sprite->changeAnimation(STAND_LEFT);
+			else if (sprite->animation() == MOVE_RIGHT || sprite->animation() == JUMPING_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
+				sprite->changeAnimation(STAND_RIGHT);
+		}
+
+		if (bJumping)
+		{
+			jumpAngle += JUMP_ANGLE_STEP;
+
+			if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32))) {
+				startY = posPlayer.y + 97;
+				jumpAngle = 92.f; // 4*23
+			}
+
+
+			if (jumpAngle == 180)
+			{
+				bJumping = false;
+				posPlayer.y = startY;
+			}
+			else
+			{
+				posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
+				if (jumpAngle > 90)
+					bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
+			}
 		}
 		else
 		{
-			posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
-			if(jumpAngle > 90)
-				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
-		}
-	}
-	else
-	{
-		if (hasCollision) posPlayer.y = posPlayer.y + FALL_STEP - 3;
-		else posPlayer.y += FALL_STEP;
-		if(map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
-		{
-			if (Game::instance().getKey('c') || Game::instance().getKey('C'))
+			if (hasCollision) posPlayer.y = posPlayer.y + FALL_STEP - 3;
+			else posPlayer.y += FALL_STEP;
+			if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
 			{
-				bJumping = true;
-				// start jumping
+				if (bDashing) {
+					bDashing = false;
+					dashing_count = 0;
+				}
+				if (Game::instance().getKey('c') || Game::instance().getKey('C'))
+				{
+					bJumping = true;
+					// start jumping
+					if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
+						sprite->changeAnimation(JUMPING_LEFT);
+					else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
+						sprite->changeAnimation(JUMPING_RIGHT);
+					jumpAngle = 0;
+					startY = posPlayer.y;
+				}
+				else if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+					if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN)
+						sprite->changeAnimation(LOOK_LEFT_UP);
+					else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN)
+						sprite->changeAnimation(LOOK_RIGHT_UP);
+				}
+				else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+					if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_UP)
+						sprite->changeAnimation(LOOK_LEFT_DOWN);
+					else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_UP)
+						sprite->changeAnimation(LOOK_RIGHT_DOWN);
+				}
+			}
+			else { // falling
 				if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
 					sprite->changeAnimation(JUMPING_LEFT);
 				else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
 					sprite->changeAnimation(JUMPING_RIGHT);
-				jumpAngle = 0;
-				startY = posPlayer.y;
-			}
-			else if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
-				if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN)
-					sprite->changeAnimation(LOOK_LEFT_UP);
-				else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN)
-					sprite->changeAnimation(LOOK_RIGHT_UP);
-			}
-			else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
-				if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_UP)
-					sprite->changeAnimation(LOOK_LEFT_DOWN);
-				else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_UP)
-					sprite->changeAnimation(LOOK_RIGHT_DOWN);
 			}
 		}
-		else { // falling
-			if (sprite->animation() == STAND_LEFT || sprite->animation() == MOVE_LEFT || sprite->animation() == LOOK_LEFT_DOWN || sprite->animation() == LOOK_LEFT_UP)
-				sprite->changeAnimation(JUMPING_LEFT);
-			else if (sprite->animation() == STAND_RIGHT || sprite->animation() == MOVE_RIGHT || sprite->animation() == LOOK_RIGHT_DOWN || sprite->animation() == LOOK_RIGHT_UP)
-				sprite->changeAnimation(JUMPING_RIGHT);
+		if (Game::instance().getKey('x') || Game::instance().getKey('X'))
+		{
+			bDashing = true;
+			bJumping = false;
 		}
 	}
-	
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
 
