@@ -30,10 +30,13 @@ public:
 	void setNumberAnimations(int nAnimations);
 	void setAnimationSpeed(int animId, int keyframesPerSec);
 	void addKeyframe(int animId, const glm::vec2 &frame);
+	bool getKeyFrame(int animId, int keyFrame);
+	//void setKeyFrame(int animId, int keyFrame);
 	void changeAnimation(int animId);
 	int animation() const;
 	
 	void setPosition(const glm::vec2 &pos);
+	//glm::vec2 getPosition();
 
 private:
 	Texture *texture;
