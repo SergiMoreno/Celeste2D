@@ -104,6 +104,8 @@ void Player::update(int deltaTime)
 {
 	bool hasCollision = false;
 	int init = posPlayer.y;
+	int initA = jumpAngle;
+	int initx = posPlayer.x;
 	sprite->update(deltaTime);
 
 	if (!Game::instance().getKey('c') && !Game::instance().getKey('C')) cReleased = true;
@@ -121,9 +123,8 @@ void Player::update(int deltaTime)
 	}
 	else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
 	{
-		if (sprite->animation() != MOVE_RIGHT) {
+		if (sprite->animation() != MOVE_RIGHT)
 			sprite->changeAnimation(MOVE_RIGHT);
-		}
 
 		posPlayer.x += 2;
 
@@ -133,41 +134,49 @@ void Player::update(int deltaTime)
 			hasCollision = true;
 		}
 	}
-	else
+	else if (!bJumping && !bClimbing)
 	{
-		if (looksLeft())
+		if (looksLeft())//&& (sprite->animation() != JUMPING_LEFT || sprite->animation() != CLIMBING_LOOK_LEFT)
 			sprite->changeAnimation(STAND_LEFT);
-		else if (looksRight()) {
+		else if (looksRight())
 			sprite->changeAnimation(STAND_RIGHT);
-		}
 	}
 
-	if (bJumping && bClimbing && !hasCollision) {
-		jumpAngle += JUMP_ANGLE_STEP;
+	//if (hasCollision) bJumping = false;
+	//else bClimbing = false;
 
-		if (map->collisionMoveUp(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-			startY = posPlayer.y + 97;
-			jumpAngle = 92; // 4*23
+	if (bJumping)
+	{
+		if (!hasCollision) {
+			jumpAngle += JUMP_ANGLE_STEP;
+			if (map->collisionMoveUp(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
+				startY = posPlayer.y + 97;
+				jumpAngle = 92; // 4*23
+			}
+			if (jumpAngle == 180)
+			{
+				bJumping = false;
+				jumpAngle = 0;
+				// posPlayer.y = startY;
+			}
+			else
+			{
+				posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
+				if (jumpAngle > 90) // falling
+					bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
+			}
 		}
-		if (jumpAngle == 180)
-		{
+		else {
+			bClimbing = true;
 			bJumping = false;
-			jumpAngle = 0;
-			//posPlayer.y = startY;
-		}
-		else
-		{
-			posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
-			if (jumpAngle > 90) // falling
-				bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
 		}
 	}
-	else if (!hasCollision) {
+	else  {
 		posPlayer.y += FALL_STEP;
 
 		if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
 		{
-			if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
+			if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased) && !bClimbing && !hasCollision)
 			{
 				bJumping = true;
 				jumpAngle = 0;
@@ -176,52 +185,125 @@ void Player::update(int deltaTime)
 				if (looksLeft()) sprite->changeAnimation(JUMPING_LEFT);
 				else sprite->changeAnimation(JUMPING_RIGHT);
 			}
-		}
-	}
-
-	if (bClimbing) {
-		climbing--;
-		if (climbing > 25) posPlayer.y -= 2;
-		else posPlayer.y += 2;
-		bClimbing = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
-
-	}
-	else if (hasCollision) {
-		posPlayer.y += FALL_STEP;
-
-		if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
-		{
-			if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
+			else if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased) && hasCollision)
 			{
 				bClimbing = true;
-				climbing = 50;
 				cReleased = false;
-				if (looksLeft()) sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
-				else sprite->changeAnimation(CLIMBING_LOOK_LEFT);
 			}
 		}
-		/*if (hasCollision && bJumping && jumpAngle > 90) {//&& jumpAngle == 0 && (bJumping || jumpAngle > 90) //hasCollision && bJumping && jumpAngle > 90
-			int pos = init + 1;
-			if (!map->collisionMoveDown(glm::ivec2(posPlayer.x, pos), glm::ivec2(dimxPlayer, dimyPlayer), &pos))
+		else {
+			if (looksLeft()) sprite->changeAnimation(JUMPING_LEFT);
+			else sprite->changeAnimation(JUMPING_RIGHT);
+		}
+	}
+	
+	if (bClimbing) {
+		jumpAngle = initA + JUMP_ANGLE_STEP;
+		if (!hasCollision) bClimbing = false;
+		else {
+			if (looksLeft()) sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
+			else sprite->changeAnimation(CLIMBING_LOOK_LEFT);
+			posPlayer.y = init - 1;
+			if (map->collisionMoveUp(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
+				posPlayer.y = init + 2;
+				jumpAngle = 120; // 4*23
+				hasCollision = false;
+			}
+			else {
+				if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
+				{
+					fromWall = true;
+					hasCollision = false;
+					wallAngle = 90;
+					otherY = init;
+					cReleased = false;
+					transicion = 100;
+					//posPlayer.y = init + 1;
+					//if (!map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {}
+					if (looksLeft()) {
+						initx -= 2;
+						sprite->changeAnimation(JUMPING_LEFT);
+						Game::instance().specialKeyReleased(GLUT_KEY_RIGHT);
+					}
+					else {
+						initx += 2;
+						sprite->changeAnimation(JUMPING_RIGHT);
+					}
+				}
+				else {
+					//if (looksLeft()) sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
+					//else sprite->changeAnimation(CLIMBING_LOOK_LEFT);
+				}
+			}
+			if (jumpAngle > 120)
 			{
-				posPlayer.y = init + 1;
-				if (looksLeft())
-					sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
-				else
-					sprite->changeAnimation(CLIMBING_LOOK_LEFT);
+				bClimbing = false;
+				jumpAngle = 0;
 			}
 		}
-		else if (hasCollision && jumpAngle != 0 && jumpAngle <= 90) {
-			int pos = init - 1;
-			if (!map->collisionMoveDown(glm::ivec2(posPlayer.x, pos), glm::ivec2(dimxPlayer, dimyPlayer), &pos))
+	}
+	else if (hasCollision) { // && jumpAngle == 0
+		posPlayer.y = init + 1;
+		if (!map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {
+			if (looksLeft()) sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
+			else sprite->changeAnimation(CLIMBING_LOOK_LEFT);
+
+			if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
 			{
-				posPlayer.y = init - 1;
-				if (looksLeft())
-					sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
-				else
-					sprite->changeAnimation(CLIMBING_LOOK_LEFT);
+				fromWall = true;
+				hasCollision = false;
+				wallAngle = 90;
+				otherY = init;
+				cReleased = false;
+				transicion = 100;
+				//posPlayer.y = init + 1;
+				//if (!map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {}
+				if (looksLeft()) {
+					initx -= 2;
+					sprite->changeAnimation(JUMPING_LEFT);
+					direction = 1;
+					Game::instance().specialKeyReleased(GLUT_KEY_RIGHT);
+				}
+				else {
+					initx += 2;
+					direction = 2;
+					sprite->changeAnimation(JUMPING_RIGHT);
+					Game::instance().specialKeyReleased(GLUT_KEY_LEFT);
+				}
 			}
-		}*/
+			
+		}
+	}
+
+	if (fromWall && !hasCollision) {
+		wallAngle += JUMP_ANGLE_STEP;
+		if (direction == 1) {
+			posPlayer.x = initx - 1;
+			if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
+			{
+				posPlayer.x += 1;
+				fromWall = false;
+			}
+			
+			sprite->changeAnimation(JUMPING_LEFT);
+		}
+		else if (direction == 2) {
+			posPlayer.x = initx + 1;
+			if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
+			{
+				posPlayer.x -= 1;
+				fromWall = false;
+			}
+			//posPlayer.y = init - 1;
+			sprite->changeAnimation(JUMPING_RIGHT);
+		}
+		//if (transicion != 0) {
+			posPlayer.y = init - 1;
+			transicion -= 2;
+		//}
+		//else posPlayer.y = int(otherY - 96 * sin(3.14159f * wallAngle / 180.f));
+		if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
+			fromWall = false;
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
