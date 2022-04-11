@@ -22,7 +22,7 @@ public:
 	void init();
 	void update_map(int state);
 	void update(int deltaTime, int state, bool* transition);
-	void update(int deltaTime, int state);
+	//void update(int deltaTime, int state);
 	void updateEntities(int deltaTime);
 	void render(int state);
 	void re_init_credits();
@@ -42,7 +42,6 @@ private:
 	ShaderProgram texProgram;
 	float currentTime;
 	int jumpAngle, startY, shake, creditant;
-	glm::ivec2 posPlayer;
 	glm::mat4 projection;
 	bool dead,tileBlock;
 

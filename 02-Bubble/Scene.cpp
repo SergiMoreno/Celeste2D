@@ -43,7 +43,7 @@ void Scene::init()
 	/*spritesheet.loadFromFile("images/title.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1, 1), &spritesheet, &texProgram);
 	sprite->setNumberAnimations(1);
-
+	*/
 	map = TileMap::createTileMap("levels/level11.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 	
 	player = new Player();
@@ -53,7 +53,7 @@ void Scene::init()
 	player->setTileMap(map);
 	dead = false;
 
-	entities = map->getEntities();
+	/*entities = map->getEntities();
 	std::vector<int> positionx = map->getPosx();
 	std::vector<int> positiony = map->getPosy();
 	Entity *e;
@@ -67,6 +67,7 @@ void Scene::init()
 		entity[i]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, entities[i]);
 		entity[i]->setPosition(glm::vec2(positionx[i] * map->getTileSize(), positiony[i] * map->getTileSize()));
 		entity[i]->setTileMap(map);
+		
 	}*/
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
@@ -192,7 +193,7 @@ void Scene::update(int deltaTime, int state, bool *transition)
 		}
 	}
 }
-
+/*
 void Scene::updateEntities(int deltaTime) 
 {
 	glm::ivec2 pos = player->getPosition();
@@ -223,7 +224,7 @@ void Scene::updateEntities(int deltaTime)
 					entity[i + 2]->eliminar();
 					i += 2;
 				}*/
-			}
+			/*}
 			break;
 		case 4:
 			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
@@ -261,7 +262,7 @@ void Scene::updateEntities(int deltaTime)
 		}
 	}
 }
-
+*/
 void Scene::render(int state)
 {
 	/*if (state == 1) {
