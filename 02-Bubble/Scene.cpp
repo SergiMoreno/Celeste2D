@@ -30,38 +30,31 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
-	/*spritesheet.loadFromFile("images/title.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1, 1), &spritesheet, &texProgram);
-	sprite->setNumberAnimations(1);
 
-	sprite->setAnimationSpeed(0, 8);
-	sprite->addKeyframe(0, glm::vec2(0.f, 0.f));
-	sprite->changeAnimation(0);
-	sprite->setPosition(glm::vec2(0.0, 0.0));*/
-
-	map = TileMap::createTileMap("levels/level03.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
-	//map = TileMap::createTileMap("menu.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	map = TileMap::createTileMap("levels/level11.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+	posPlayer = map->getInitialPos();
+	player->setPosition(glm::vec2(posPlayer.x * map->getTileSize(), posPlayer.y * map->getTileSize()));
 	player->setTileMap(map);
 	dead = false;
 
-	//int vecPosx[14] = {5,6,9,10,11,12,13,8,9,11,   8,13,2,2};
-	//int vecPosy[14] = {14,14,13,13,12,12,12,9,6,6,  10,2,10,11};
-	num = 6;
-	int vecPosx[6] = { 4,8,7,9,12,14};
-	int vecPosy[6] = { 14,14,14,14,14,14};
-	/*
-	for (int i = 0;i < num;i++) {
-		entity[i] = new Entity();
-		entity[i]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, types[i]);
-		if (i == 2) entity[i]->setPosition(glm::vec2(vecPosx[i] * map->getTileSize() + 4, vecPosy[i] * map->getTileSize()));
-		else if (i == 3) entity[i]->setPosition(glm::vec2(vecPosx[i] * map->getTileSize() -4, vecPosy[i] * map->getTileSize()));
-		else entity[i]->setPosition(glm::vec2(vecPosx[i] * map->getTileSize(), vecPosy[i] * map->getTileSize()));
-		entity[i]->setTileMap(map);
-	}*/
-	
+	entities = map->getEntities();
+	std::vector<int> positionx = map->getPosx();
+	std::vector<int> positiony = map->getPosy();
+	Entity *e;
+	for (unsigned int i = 0;i < entities.size();i++) {
+		e = new Entity();
+		e->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, entities[i]);
+		e->setPosition(glm::vec2(positionx[i] * map->getTileSize(), positiony[i] * map->getTileSize()));
+		e->setTileMap(map);
+		entity.push_back(e);
+		/*entities[i] = new Entity();
+		entity[i]->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram, entities[i]);
+		entity[i]->setPosition(glm::vec2(positionx[i] * map->getTileSize(), positiony[i] * map->getTileSize()));
+		entity[i]->setTileMap(map);*/
+	}
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
 }
@@ -71,8 +64,9 @@ void Scene::update(int deltaTime, int state)
 	if (state == 1 && !dead) {
 		currentTime += deltaTime;
 		player->update(deltaTime);
-		glm::ivec2 pos = player->getPosition();
-		/*dead = entity[0]->collisionEntity(pos, glm::vec2(28, 28));
+		updateEntities(deltaTime);
+		
+		/*
 		entity[1]->update(deltaTime,1);
 		entity[2]->update(deltaTime, 2);
 		entity[3]->update(deltaTime, 3);
@@ -118,9 +112,78 @@ void Scene::update(int deltaTime, int state)
 	}
 	else if (dead) {
 		//sprite->update(deltaTime);
-		player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
+		player->setPosition(glm::vec2(posPlayer.x * map->getTileSize(), posPlayer.y * map->getTileSize()));
 		player->update(deltaTime);
 		dead = false;
+	}
+}
+
+void Scene::updateEntities(int deltaTime) 
+{
+	glm::ivec2 pos = player->getPosition();
+	for (unsigned int i = 0;i < entity.size();i++) {
+		entity[i]->update(deltaTime);
+		switch (entities[i]) {
+		case 0:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28)) && !dead) {
+				dead = true;
+			}
+			break;
+		case 1:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
+				player->increaseScore();
+				entity[i]->eliminar();
+				if (entities[i + 1] == 2) {
+					entity[i + 1]->update(deltaTime);
+					entity[i + 1]->eliminar();
+					entity[i - 1]->eliminar();
+					i += 1;
+				}
+				/*player->increaseScore();
+				entity[i]->eliminar();
+				if (types[i + 1] == 2) {
+					entity[i + 1]->update(deltaTime);
+					entity[i + 2]->update(deltaTime);
+					entity[i + 1]->eliminar();
+					entity[i + 2]->eliminar();
+					i += 2;
+				}*/
+			}
+			break;
+		case 4:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
+				entity[i]->eliminar();
+				//entity[i+1]->transformChest();
+				unsigned int e = 0;
+				for (;e < entities.size() && entities[e] != 5;e++) {}
+				entity[e]->transformChest();
+			}
+			break;
+		case 5:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
+				player->increaseScore();
+				entity[i]->eliminar();
+			}
+			break;
+		case 6:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28)) && entity[i]->getHideBalloon() == 0) {
+				entity[i]->setHideBalloon();
+				player->resetJump();
+			}
+			break;
+		case 8:
+			break;
+		case 9:
+			break;
+		case 10:
+			break;
+		case 11:
+			break;
+		case 12:
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -138,8 +201,8 @@ void Scene::render(int state)
 		map->render();
 		//if (!dead)
 			player->render();
-		int i = 0;
-		//for (;i < num;i++) entity[i]->render();
+	
+		for (unsigned int i = 0;i < entity.size();i++) entity[i]->render();
 	}
 	else {
 		//sprite->render();

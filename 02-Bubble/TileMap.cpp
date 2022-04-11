@@ -76,6 +76,12 @@ bool TileMap::loadLevel(const string &levelFile)
 	tilesheet.setMagFilter(GL_NEAREST);
 	getline(fin, line);
 	sstream.str(line);
+	sstream >> playerPos.x >> playerPos.y;
+	getline(fin, line);
+	sstream.str(line);
+	sstream >> victoryPos.x >> victoryPos.y;
+	getline(fin, line);
+	sstream.str(line);
 	sstream >> tilesheetSize.x >> tilesheetSize.y;
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 	
@@ -93,6 +99,24 @@ bool TileMap::loadLevel(const string &levelFile)
 		fin.get(tile);
 #endif
 	}
+
+	for (int j = 0;j < mapSize.y;j++)
+	{
+		getline(fin, line);
+		tile = strtok(&line[0], " ");
+		for (int i = 0; i < mapSize.x && tile != NULL; i++)
+		{
+			if (*tile != '#') {
+				int entity = stoi(tile);
+				entities.push_back(entity);
+				positionx.push_back(i);
+				positiony.push_back(j);
+			}
+			
+			tile = strtok(NULL, " ");
+		}
+	}
+
 	fin.close();
 	
 	return true;
@@ -222,6 +246,32 @@ bool TileMap::collisionMoveUp(const glm::ivec2& pos, const glm::ivec2& size) con
 
 	return false;
 
+}
+
+glm::ivec2 TileMap::getInitialPos()
+{
+	return playerPos;
+}
+
+std::vector<int> TileMap::getEntities()
+{
+	return entities;
+}
+/*
+int *TileMap::getEntities()
+{
+	std::vector<int>::iterator it = entities.begin();
+	return &(*it);
+}*/
+
+std::vector<int> TileMap::getPosx()
+{
+	return positionx;
+}
+
+std::vector<int> TileMap::getPosy()
+{
+	return positiony;
 }
 /*
 bool TileMap::diesDowm(const glm::ivec2& pos, const glm::ivec2& size, int* posY, const glm::ivec2& pos1, const glm::ivec2& size1) const

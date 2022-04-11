@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <fstream>      // std::ifstream
+#include <vector>
 #include "Texture.h"
 #include "ShaderProgram.h"
 
@@ -30,6 +31,11 @@ public:
 	void free();
 	
 	int getTileSize() const { return tileSize; }
+	glm::ivec2 getInitialPos();
+	std::vector<int> getEntities();
+	//int* getEntities();
+	std::vector<int> getPosx();
+	std::vector<int> getPosy();
 
 	bool collisionMoveLeft(const glm::ivec2 &pos, const glm::ivec2 &size) const;
 	bool collisionMoveRight(const glm::ivec2 &pos, const glm::ivec2 &size) const;
@@ -44,11 +50,12 @@ private:
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
-	glm::ivec2 position, mapSize, tilesheetSize;
+	glm::ivec2 position, mapSize, tilesheetSize, playerPos, victoryPos;
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
+	std::vector<int> entities, positionx, positiony;
 
 };
 
