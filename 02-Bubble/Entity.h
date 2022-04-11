@@ -16,7 +16,7 @@ class Entity
 public:
 	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgra, int entity);
 
-	void update(int deltaTime, int entity);
+	void update(int deltaTime);
 	void render();
 
 	void setTileMap(TileMap* tileMap);
@@ -37,6 +37,7 @@ private:
 	bool up;
 	int currentDisp, hideBalloon;
 	bool elim;//, transformChest;
+	int type;
 };
 
 

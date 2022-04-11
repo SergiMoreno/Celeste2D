@@ -22,6 +22,8 @@ public:
 	void init();
 	void update_map(int state);
 	void update(int deltaTime, int state, bool* transition);
+	void update(int deltaTime, int state);
+	void updateEntities(int deltaTime);
 	void render(int state);
 	void re_init_credits();
 	void resetPlayer();
@@ -32,7 +34,11 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	Entity *entity[14];
+	//Entity *entity[20];
+	glm::ivec2 posPlayer;
+	std::vector<Entity*> entity;
+	std::vector<int> entities;
+	//int *entities;
 	ShaderProgram texProgram;
 	float currentTime;
 	int jumpAngle, startY, shake, creditant;
@@ -47,7 +53,7 @@ private:
 	//Texture spritesheet;
 	//Sprite* sprite;
 	//int types[14] = {0,0,0,0,0,0,0,1,2,3,4,5,6,7};
-	int types[6] = { 0,1,2,3,4,5};
+	int types[13] = { 0,1,2,3,4,5,6,7,8,9,10,11,12};
 	int num;
 };
 

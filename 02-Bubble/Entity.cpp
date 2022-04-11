@@ -7,7 +7,7 @@
 
 enum EntityType
 {
-	SPIKE, STRAWBERRY, L_WING, R_WING, KEY, CHEST, BALLOON, STRING, MAX_ENTITIES
+	SPIKE, STRAWBERRY, L_WING, R_WING, KEY, CHEST, BALLOON, STRING, L_CLOUD, R_CLOUD, BOX, TRAMPOLINE, FLAG, MAX_ENTITIES
 };
 
 
@@ -15,11 +15,12 @@ void Entity::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, in
 {
 	spritesheet.loadFromFile("images/entities.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	float dimx = 8.f / 64.f;
-	float dimy = 8.f / 16.f;
+	float dimy = 8.f / 32.f;
 	size = glm::ivec2(32, 32);
 	sprite = Sprite::createSprite(size, glm::vec2(dimx, dimy), &spritesheet, &shaderProgram);
+	type = entity;
 
-	switch (entity) {
+	switch (type) {
 	case SPIKE:
 		sprite->setNumberAnimations(1);
 		sprite->setAnimationSpeed(0, 8);
@@ -86,6 +87,45 @@ void Entity::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, in
 		currentDisp = 24;
 		up = false;
 		break;
+	case L_CLOUD:
+		sprite->setNumberAnimations(1);
+		sprite->setAnimationSpeed(0, 6);
+		sprite->addKeyframe(0, glm::vec2(0, 2 * dimy));
+		currentDisp = 24;
+		up = false;
+		break;
+	case R_CLOUD:
+		sprite->setNumberAnimations(1);
+		sprite->setAnimationSpeed(0, 6);
+		sprite->addKeyframe(0, glm::vec2(dimx, 2 * dimy));
+		currentDisp = 24;
+		up = false;
+		break;
+	case BOX:
+		sprite->setNumberAnimations(2);
+
+		sprite->setAnimationSpeed(0, 6);
+		sprite->addKeyframe(0, glm::vec2(2 * dimx, 2 * dimy));
+
+		sprite->setAnimationSpeed(1, 6);
+		sprite->addKeyframe(1, glm::vec2(2 * dimx, 2 * dimy));
+		sprite->addKeyframe(1, glm::vec2(3 * dimx, 2 * dimy));
+		sprite->addKeyframe(1, glm::vec2(4 * dimx, 2 * dimy));
+		break;
+	case TRAMPOLINE:
+		sprite->setNumberAnimations(2);
+		sprite->setAnimationSpeed(0, 6);
+		sprite->addKeyframe(0, glm::vec2(5 * dimx, 2 * dimy));
+		sprite->setAnimationSpeed(1, 6);
+		sprite->addKeyframe(1, glm::vec2(6 * dimx, 2 * dimy));
+		break;
+	case FLAG:
+		sprite->setNumberAnimations(1);
+		sprite->setAnimationSpeed(0, 6);
+		sprite->addKeyframe(0, glm::vec2(0, 3 * dimy));
+		sprite->addKeyframe(0, glm::vec2(dimx, 3 * dimy));
+		sprite->addKeyframe(0, glm::vec2(2 * dimx, 3 * dimy));
+		break;
 	default:
 		break;
 	}
@@ -95,10 +135,10 @@ void Entity::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, in
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEntity.x), float(tileMapDispl.y + posEntity.y)));
 }
 
-void Entity::update(int deltaTime, int entity)
+void Entity::update(int deltaTime)
 {
 	sprite->update(deltaTime);
-	switch (entity) {
+	switch (type) {
 	case STRAWBERRY:
 	case L_WING:
 	case R_WING:
@@ -115,10 +155,37 @@ void Entity::update(int deltaTime, int entity)
 			if (currentDisp == 24) up = false;
 		}
 		break;
+	case CHEST:
+		if (sprite->animation() == 1) {
+			if (currentDisp >= 0 && !up) {
+				if (currentDisp % 6 == 0) posEntity.y -= 2;
+				currentDisp--;
+				if (currentDisp == 0) up = true;
+			}
+			else {
+				if (currentDisp % 6 == 0) posEntity.y += 2;
+				currentDisp++;
+				if (currentDisp == 24) up = false;
+			}
+		}
+		break;
+	case L_CLOUD:
+	case R_CLOUD:
+		if (currentDisp >= 0 && !up) {
+			if (currentDisp % 6 == 0) posEntity.x -= 2;
+			currentDisp--;
+			if (currentDisp == 0) up = true;
+		}
+		else {
+			if (currentDisp % 6 == 0) posEntity.x += 2;
+			currentDisp++;
+			if (currentDisp == 24) up = false;
+		}
+		break;
 	default:
 		break;
 	}
-	if ((entity == BALLOON || entity == STRING) && hideBalloon > 0) hideBalloon--;
+	if ((type == BALLOON || type == STRING) && hideBalloon > 0) hideBalloon--;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEntity.x), float(tileMapDispl.y + posEntity.y)));
 }
 
@@ -135,13 +202,15 @@ void Entity::setTileMap(TileMap* tileMap)
 void Entity::setPosition(const glm::vec2& pos)
 {
 	posEntity = pos;
+	if (type == L_WING) posEntity.x += 4;
+	else if (type == R_WING) posEntity.x -= 4;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posEntity.x), float(tileMapDispl.y + posEntity.y)));
 }
 
 bool Entity::collisionEntity(const glm::ivec2& pos, const glm::ivec2& psize) const
 {
 	int pminx, pmaxx, pminy, pmaxy, eminx, emaxx, eminy, emaxy;
-
+	if (type == CHEST && sprite->animation() != 1) return false;
 	pminx = pos.x;
 	pmaxx = (pos.x + psize.x - 1);
 	pminy = pos.y;
@@ -171,8 +240,8 @@ int Entity::getHideBalloon()
 
 void Entity::transformChest()
 {
+	//type = STRAWBERRY;
 	sprite->changeAnimation(1);
-	
 }
 
 void Entity::eliminar()
