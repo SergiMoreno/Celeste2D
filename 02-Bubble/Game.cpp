@@ -2,9 +2,14 @@
 #include <GL/glut.h>
 #include "Game.h"
 
+enum lvl {
+	Title, lvl1, lvl2, lvl3, lvl4, lvl5, lvl6, lvl7, lvl8, lvl9, lvl10, lvl11, Credits, Instruccions
+};
+
 
 void Game::init()
 {
+	transition = false;
 	bPlay = true;
 	state = 0;
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
@@ -13,7 +18,7 @@ void Game::init()
 
 bool Game::update(int deltaTime)
 {
-	scene.update(deltaTime, state);	
+	scene.update(deltaTime, state, &transition);
 	
 	return bPlay;
 }
@@ -26,14 +31,61 @@ void Game::render()
 
 void Game::keyPressed(int key)
 {
-	switch (key)
-	{
-	case 27: bPlay = false;
+	switch (state) {
+	case Title:
+		switch (key)
+		{
+		case 27: bPlay = false;
+			break;
+		case 'c':
+		case 'x':
+		case 'C':
+		case 'X':
+			transition = true;
+			scene.resetPlayer();
+			state = lvl1;
+			scene.update_map(state);
+			break;
+		case 'i':
+		case 'I':
+			state = Instruccions;
+		default:
+			break;
+		}
 		break;
-	case 88:
-	case 120: state = 1;
+	case Instruccions:
+		switch (key)
+		{
+		case 27: bPlay = false;
+			break;
+		case 13: //enter
+			state = Title;
+			break;
+		default:
+			break;
+		}
+		break;
+	case Credits:
+		switch (key)
+		{
+		case 27: bPlay = false;
+			break;
+		case 13:
+			state = Title;
+			scene.re_init_credits();
+			break;
+		default:
+			break;
+		}
 		break;
 	default:
+		switch (key)
+		{
+		case 27: bPlay = false;
+			break;
+		default:
+			break;
+		}
 		break;
 	}
 	keys[key] = true;
@@ -41,6 +93,71 @@ void Game::keyPressed(int key)
 
 void Game::keyReleased(int key)
 {
+	if (!transition) {
+		switch (key)
+		{
+		case '1':
+			if (state != lvl1) {
+				state = lvl1;
+				transition = true;
+			}
+			break;
+		case '2':
+			if (state != lvl2) {
+				state = lvl2;
+				transition = true;
+			}
+			break;
+		case '3':
+			if (state != lvl3) {
+				state = lvl3;
+				transition = true;
+			}
+			break;
+		case '4':
+			if (state != lvl4) {
+				state = lvl4;
+				transition = true;
+			}
+			break;
+		case '5':
+			if (state != lvl5) {
+				state = lvl5;
+				transition = true;
+			}
+			break;
+		case '6':
+			if (state != lvl6) {
+				state = lvl6;
+				transition = true;
+			}
+			break;
+		case '7':
+			if (state != lvl7) {
+				state = lvl7;
+				transition = true;
+			}
+			break;
+		case '8':
+			if (state != lvl8) {
+				state = lvl8;
+				transition = true;
+			}
+			break;
+		case '9':
+			if (state != lvl9) {
+				state = lvl9;
+				transition = true;
+			}
+			break;
+		default:
+			break;
+		}
+		if (transition) {
+			scene.resetPlayer();
+			scene.update_map(state);
+		}
+	}
 	keys[key] = false;
 }
 
@@ -74,6 +191,15 @@ bool Game::getKey(int key) const
 bool Game::getSpecialKey(int key) const
 {
 	return specialKeys[key];
+}
+
+void Game::canviDestat() {
+	++state;
+	if (state < 12) {
+		transition = true;
+		scene.resetPlayer();
+		scene.update_map(state);
+	}
 }
 
 

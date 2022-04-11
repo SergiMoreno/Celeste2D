@@ -20,8 +20,11 @@ public:
 	~Scene();
 
 	void init();
-	void update(int deltaTime, int state);
+	void update_map(int state);
+	void update(int deltaTime, int state, bool* transition);
 	void render(int state);
+	void re_init_credits();
+	void resetPlayer();
 
 private:
 	void initShaders();
@@ -32,9 +35,15 @@ private:
 	Entity *entity[14];
 	ShaderProgram texProgram;
 	float currentTime;
+	int jumpAngle, startY, shake, creditant;
+	glm::ivec2 posPlayer;
 	glm::mat4 projection;
-	bool dead;
+	bool dead,tileBlock;
 
+	Texture spritesheet_pantalla;
+	Texture spritesheet_credits;
+	Sprite* sprite_pantalla;
+	Sprite* sprite_credits;
 	//Texture spritesheet;
 	//Sprite* sprite;
 	//int types[14] = {0,0,0,0,0,0,0,1,2,3,4,5,6,7};

@@ -30,6 +30,16 @@ Scene::~Scene()
 void Scene::init()
 {
 	initShaders();
+
+	spritesheet_credits.loadFromFile("images/credits.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite_credits = Sprite::createSprite(glm::ivec2(512, 1024), glm::vec2(1, 1), &spritesheet_credits, &texProgram);
+
+
+	spritesheet_pantalla.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite_pantalla = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_pantalla, &texProgram);
+	sprite_pantalla->setPosition(glm::vec2(0, 0));
+
+
 	/*spritesheet.loadFromFile("images/title.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1, 1), &spritesheet, &texProgram);
 	sprite->setNumberAnimations(1);
@@ -64,14 +74,37 @@ void Scene::init()
 	
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
 	currentTime = 0.0f;
+
+	jumpAngle = 180;
+	shake = 0;
+	creditant = 0;
 }
 
-void Scene::update(int deltaTime, int state)
+void Scene::update_map(int state) {
+	if (state > 0 && state < 12) {
+		if (state < 10) {
+			map = TileMap::createTileMap("levels/level0" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			player->setTileMap(map);
+		}
+		else {
+			map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+			player->setTileMap(map);
+		}
+	}
+}
+
+void Scene::update(int deltaTime, int state, bool *transition)
 {
-	if (state == 1 && !dead) {
-		currentTime += deltaTime;
-		player->update(deltaTime);
-		glm::ivec2 pos = player->getPosition();
+	if (*transition == false && !dead) {
+		if (state > 0 && state < 12) {
+			currentTime += deltaTime;
+			player->update(deltaTime);
+		}
+		//currentTime += deltaTime;
+		//player->update(deltaTime);
+		//glm::ivec2 pos = player->getPosition();
+
+
 		/*dead = entity[0]->collisionEntity(pos, glm::vec2(28, 28));
 		entity[1]->update(deltaTime,1);
 		entity[2]->update(deltaTime, 2);
@@ -116,17 +149,57 @@ void Scene::update(int deltaTime, int state)
 			}
 		}*/
 	}
-	else if (dead) {
-		//sprite->update(deltaTime);
-		player->setPosition(glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), INIT_PLAYER_Y_TILES * map->getTileSize()));
-		player->update(deltaTime);
-		dead = false;
+	else if (dead || *transition) {
+		if (jumpAngle == 180)
+		{
+			jumpAngle = 0;
+			startY = 512;
+		}
+		else
+		{
+			if (shake == 0) {
+				jumpAngle += 4;
+
+				posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
+				player->setPosition(posPlayer);
+			}
+			if (jumpAngle > 90) {
+				if ((map->collisionMoveDown(posPlayer, glm::ivec2(28, 28), &posPlayer.y)) || shake > 0) {
+					switch (shake) {
+					case 4:
+						if (state < 10) {
+							map = TileMap::createTileMap("levels/level0" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+						}
+						else {
+							map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+						}
+						posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
+						*transition = false;
+						dead = false;
+						jumpAngle = 180;
+						shake = 0;
+						break;
+					default:
+						if (state < 10) {
+							map = TileMap::createTileMap("levels/level0" + to_string(state) + ".txt", glm::vec2(((shake % 2) * 2 - 1) * 5, (((shake + 1) % 2) * 2 - 1) * 5), texProgram);
+						}
+						else {
+							map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(((shake % 2) * 2 - 1) * 5, (((shake + 1) % 2) * 2 - 1) * 5), texProgram);
+						}
+						posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize() + ((shake % 2) * 2 - 1) * 5, int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)) + (((shake + 1) % 2) * 2 - 1) * 5);
+						++shake;
+						break;
+					}
+					player->setPosition(posPlayer);
+				}
+			}
+		}
 	}
 }
 
 void Scene::render(int state)
 {
-	if (state == 1) {
+	/*if (state == 1) {
 		glm::mat4 modelview;
 
 		texProgram.use();
@@ -143,7 +216,42 @@ void Scene::render(int state)
 	}
 	else {
 		//sprite->render();
+	}*/
+
+	glm::mat4 modelview;
+
+	texProgram.use();
+	texProgram.setUniformMatrix4f("projection", projection);
+	texProgram.setUniform4f("color", 1.0f, 1.0f, 1.0f, 1.0f);
+	modelview = glm::mat4(1.0f);
+	texProgram.setUniformMatrix4f("modelview", modelview);
+	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
+
+	switch (state) {
+	case 0:			//Title
+		spritesheet_pantalla.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		sprite_pantalla->render();
+		break;
+	case 13:		//Instructions
+		spritesheet_pantalla.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		sprite_pantalla->render();
+		break;
+	case 12:		//Credits
+		if (creditant > -512) {
+			--creditant;
+			sprite_credits->setPosition(glm::vec2(0, creditant));
+		}
+		sprite_credits->render();
+		break;
+	default:
+		map->render();
+		player->render();
+		break;
 	}
+}
+
+void Scene::re_init_credits() {
+	creditant = 0;
 }
 
 void Scene::initShaders()
@@ -175,6 +283,11 @@ void Scene::initShaders()
 	vShader.free();
 	fShader.free();
 }
+
+void Scene::resetPlayer() {
+	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+}
+
 
 
 
