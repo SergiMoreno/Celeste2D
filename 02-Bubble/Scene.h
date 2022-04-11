@@ -43,7 +43,7 @@ private:
 	float currentTime;
 	int jumpAngle, startY, shake, creditant;
 	glm::mat4 projection;
-	bool dead,tileBlock;
+	bool dead;
 
 	Texture spritesheet_pantalla;
 	Texture spritesheet_credits;

@@ -156,12 +156,11 @@ void Scene::update(int deltaTime, int state, bool *transition)
 		{
 			if (shake == 0) {
 				jumpAngle += 4;
-
 				posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
 				player->setPosition(posPlayer);
 			}
 			if (jumpAngle > 90) {
-				if ((map->collisionMoveDown(posPlayer, glm::ivec2(28, 28), &posPlayer.y)) || shake > 0) {
+				if ((map->collisionMoveDown(posPlayer, glm::ivec2(28, 28), &posPlayer.y) && (!map->collisionMoveDown(posPlayer, glm::ivec2(28, 0), &posPlayer.y))) || shake > 0) {
 					switch (shake) {
 					case 4:
 						if (state < 10) {
