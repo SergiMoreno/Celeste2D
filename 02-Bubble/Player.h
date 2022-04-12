@@ -29,7 +29,7 @@ public:
 	bool looksRight();
 	
 private:
-	bool bJumping, bDashing, cReleased, fromWall, bMoving, bClimbing;
+	bool bJumping, bDashing, cReleased, sPressed ,fromWall, bMoving, bClimbing;
 	glm::ivec2 tileMapDispl, posPlayer;
 	int jumpAngle, startY, dimyPlayer, dimxPlayer, direction, dashing_count, dash_direction, walking, climbing, wallAngle, otherY;
 	Texture spritesheet;
@@ -39,6 +39,8 @@ private:
 	bool arriba;
 	int posInicial;
 	int transicion;
+	int slowmo;
+	//int JUMP_ANGLE_STEP, FALL_STEP, MOVIMENT_LATERAL;
 };
 
 

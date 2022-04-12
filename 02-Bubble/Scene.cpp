@@ -8,7 +8,7 @@
 #define SCREEN_X 0//64
 #define SCREEN_Y 0//16
 
-#define INIT_PLAYER_X_TILES 2//2//0
+#define INIT_PLAYER_X_TILES 1//2//0
 #define INIT_PLAYER_Y_TILES 14//14//11
 
 

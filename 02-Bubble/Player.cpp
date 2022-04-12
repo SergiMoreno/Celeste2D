@@ -6,11 +6,12 @@
 #include "Game.h"
 
 
-#define JUMP_ANGLE_STEP 4
+#define JUMP_ANGLE_STEP 4/slowmo
 #define JUMP_HEIGHT 96
-#define FALL_STEP 4
+#define FALL_STEP 4/slowmo
 #define DASH_MOVEMENT 0
 #define DIV 2
+#define MOVIMENT_LATERAL 2/slowmo
 
 
 enum PlayerAnims
@@ -29,10 +30,12 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 {
 	bJumping = false;
 	cReleased = true;
+	sPressed = false;
 	direction = RIGHT;
 	bDashing = false;
 	bClimbing = false;
 	bMoving = false;
+	slowmo = 1;
 	//hasCollision = false;
 	fromWall = false;
 	dashing_count = 0;
@@ -108,16 +111,30 @@ void Player::update(int deltaTime)
 	int initx = posPlayer.x;
 	sprite->update(deltaTime);
 
+	if (Game::instance().getKey('s') || Game::instance().getKey('S')) sPressed = true;
+
+	if (!Game::instance().getKey('s') && !Game::instance().getKey('S') && sPressed){
+			switch (slowmo) {
+			case 1:
+				slowmo = 2;
+				break;
+			default:
+				slowmo = 1;
+				break;
+			}
+			sPressed = false;
+	}
+
 	if (!Game::instance().getKey('c') && !Game::instance().getKey('C')) cReleased = true;
 
 	if (Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 	{
 		if (sprite->animation() != MOVE_LEFT)
 			sprite->changeAnimation(MOVE_LEFT);
-		posPlayer.x -= 2;
+		posPlayer.x -= MOVIMENT_LATERAL;
 		if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
 		{
-			posPlayer.x += 2;
+			posPlayer.x += MOVIMENT_LATERAL;
 			hasCollision = true;
 		}
 	}
@@ -126,11 +143,11 @@ void Player::update(int deltaTime)
 		if (sprite->animation() != MOVE_RIGHT)
 			sprite->changeAnimation(MOVE_RIGHT);
 
-		posPlayer.x += 2;
+		posPlayer.x += MOVIMENT_LATERAL;
 
 		if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
 		{
-			posPlayer.x -= 2;
+			posPlayer.x -= MOVIMENT_LATERAL;
 			hasCollision = true;
 		}
 	}

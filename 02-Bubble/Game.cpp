@@ -150,6 +150,12 @@ void Game::keyReleased(int key)
 				transition = true;
 			}
 			break;
+		case '0':
+			if (state != lvl10) {
+				state = lvl10;
+				transition = true;
+			}
+			break;
 		default:
 			break;
 		}
