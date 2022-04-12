@@ -24,19 +24,21 @@ public:
 	glm::ivec2 getPosition();
 	void resetJump();
 	void increaseScore();
+	void setInfinity_dash(bool d);
+	bool getInfinity_dash();
 
 	bool looksLeft();
 	bool looksRight();
 	
 private:
-	bool bJumping, bDashing, cReleased, sPressed ,fromWall, bMoving, bClimbing;
+	bool bJumping, bDashing, cReleased, sPressed ,fromWall, bMoving, bClimbing, xReleased;
 	glm::ivec2 tileMapDispl, posPlayer;
 	int jumpAngle, startY, dimyPlayer, dimxPlayer, direction, dashing_count, dash_direction, walking, climbing, wallAngle, otherY;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
 	int score;
-	bool arriba;
+	bool arriba, infinity_dash;
 	int posInicial;
 	int transicion;
 	int slowmo;

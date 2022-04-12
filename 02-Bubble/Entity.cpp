@@ -222,13 +222,13 @@ bool Entity::collisionEntity(const glm::ivec2& pos, const glm::ivec2& psize) con
 	emaxy = (posEntity.y + size.y - 1);
 
 	//if (((pminx + 8) < emaxx) && (eminx < (pmaxx - 8)) && ((pminy + 8) < emaxy) && (eminy < (pmaxy - 8))) return true;//((pminy - 8) > emaxy)) return true;
-	if (((pminx+8) < emaxx) && (eminx < (pmaxx-8)) && ((pminy+8) < emaxy) && (eminy < (pmaxy-8))) {
+	if (((pminx + 8) < emaxx) && (eminx < (pmaxx - 8)) && ((pminy + 8) < emaxy) && (eminy < (pmaxy - 8))) {
 		return true;
 	}
 	return false;
 }
 
-void Entity::setHideBalloon() 
+void Entity::setHideBalloon()
 {
 	hideBalloon = 100;
 }

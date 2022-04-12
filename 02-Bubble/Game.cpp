@@ -83,6 +83,16 @@ void Game::keyPressed(int key)
 		{
 		case 27: bPlay = false;
 			break;
+		case 'G':
+		case 'g':
+			if (scene.getVulnerability()) scene.setVulnerability(false);
+			else scene.setVulnerability(true);
+			break;
+		case 'D':
+		case 'd':
+			if (scene.getInfinity_dash()) scene.setInfinity_dash(true);
+			else scene.setInfinity_dash(false);
+			break;
 		default:
 			break;
 		}

@@ -20,6 +20,8 @@ public:
 	~Scene();
 
 	void init();
+	void init_player();
+	void init_entities();
 	void update_map(int state);
 	void update(int deltaTime, int state, bool* transition);
 	//void update(int deltaTime, int state);
@@ -27,6 +29,10 @@ public:
 	void render(int state);
 	void re_init_credits();
 	void resetPlayer();
+	void setVulnerability(bool v);
+	bool getVulnerability();
+	void setInfinity_dash(bool d);
+	bool getInfinity_dash();
 
 private:
 	void initShaders();
@@ -34,25 +40,19 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	//Entity *entity[20];
 	glm::ivec2 posPlayer;
 	std::vector<Entity*> entity;
 	std::vector<int> entities;
-	//int *entities;
 	ShaderProgram texProgram;
 	float currentTime;
 	int jumpAngle, startY, shake, creditant;
 	glm::mat4 projection;
-	bool dead;
+	bool dead, vulnerability;
 
 	Texture spritesheet_pantalla;
 	Texture spritesheet_credits;
 	Sprite* sprite_pantalla;
 	Sprite* sprite_credits;
-	//Texture spritesheet;
-	//Sprite* sprite;
-	//int types[14] = {0,0,0,0,0,0,0,1,2,3,4,5,6,7};
-	int types[13] = { 0,1,2,3,4,5,6,7,8,9,10,11,12};
 	int num;
 };
 

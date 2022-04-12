@@ -14,7 +14,7 @@ class Entity
 {
 
 public:
-	void init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgra, int entity);
+	void init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgra, int entity);
 
 	void update(int deltaTime);
 	void render();
@@ -42,3 +42,4 @@ private:
 
 
 #endif // _ENTITY_INCLUDE
+
