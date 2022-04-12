@@ -220,6 +220,15 @@ void Player::update(int deltaTime)
 	if (dashing_count < 2) {
 		if (Game::instance().getSpecialKey(GLUT_KEY_LEFT))
 		{
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				direction = LEFT_UP;
+			}
+			else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+				direction = LEFT_DOWN;
+			}
+			else {
+				direction = LEFT;
+			}
 			if (sprite->animation() != MOVE_LEFT)
 				sprite->changeAnimation(MOVE_LEFT);
 			posPlayer.x -= MOVIMENT_LATERAL;
@@ -231,6 +240,15 @@ void Player::update(int deltaTime)
 		}
 		else if (Game::instance().getSpecialKey(GLUT_KEY_RIGHT))
 		{
+			if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+				direction = RIGHT_UP;
+			}
+			else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+				direction = RIGHT_DOWN;
+			}
+			else {
+				direction = RIGHT;
+			}
 			if (sprite->animation() != MOVE_RIGHT)
 				sprite->changeAnimation(MOVE_RIGHT);
 
@@ -241,6 +259,12 @@ void Player::update(int deltaTime)
 				posPlayer.x -= MOVIMENT_LATERAL;
 				hasCollision = true;
 			}
+		}
+		else if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+			direction = UP;
+		}
+		else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+			direction = DOWN;
 		}
 		else if (!bJumping && !bClimbing)
 		{
@@ -291,6 +315,10 @@ void Player::update(int deltaTime)
 
 			if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
 			{
+				if (bDashing) {
+					bDashing = false;
+					dashing_count = 0;
+				}
 				if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased) && !bClimbing && !hasCollision)
 				{
 					bJumping = true;
