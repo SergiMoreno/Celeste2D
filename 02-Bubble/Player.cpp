@@ -10,7 +10,7 @@
 #define JUMP_HEIGHT 96
 #define FALL_STEP 4/slowmo
 #define DASH_MOVEMENT 0
-#define DIV 2
+#define DIV 2* ((slowmo-1) * 3 + 1)
 #define MOVIMENT_LATERAL 2/slowmo
 
 
@@ -119,9 +119,11 @@ void Player::update(int deltaTime)
 			switch (slowmo) {
 			case 1:
 				slowmo = 2;
+				if (dashing_count > 1) dashing_count = dashing_count * 2;
 				break;
 			default:
 				slowmo = 1;
+				if(dashing_count>1) dashing_count = dashing_count / 2;
 				break;
 			}
 			sPressed = false;
@@ -133,48 +135,48 @@ void Player::update(int deltaTime)
 	if (bDashing) {
 		if (dashing_count == 0) {
 			dash_direction = direction;
-			dashing_count = 24;
+			dashing_count = 24*slowmo;
 		}
 		else if (dashing_count != 1) {
 			--dashing_count;
 			switch (direction) {
 			case 0:		//UP
-				posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.y -= DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveUp(posPlayer, glm::ivec2(32, 32))) {
-					posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.y += DASH_MOVEMENT + dashing_count / (DIV);
 					dashing_count = 1;
 				}
 				break;
 			case 1:		//RIGHT_UP
-				posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.y -= DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveUp(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.y += DASH_MOVEMENT + dashing_count / (DIV);
 				}
-				posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.x += DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.x -= DASH_MOVEMENT + dashing_count / (DIV);
 				}
 				break;
 			case 2:		//RIGHT
-				posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.x += DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.x -= DASH_MOVEMENT + dashing_count / (DIV);
 					dashing_count = 1;
 				}
 				break;
 			case 3:		//RIGHT_DOWN
-				posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.x += DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.x -= DASH_MOVEMENT + dashing_count / (DIV);
 				}
-				if (DASH_MOVEMENT + dashing_count / DIV >= FALL_STEP) posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				if (DASH_MOVEMENT + dashing_count / (DIV) >= FALL_STEP) posPlayer.y += DASH_MOVEMENT + dashing_count / (DIV);
 				else  posPlayer.y += FALL_STEP;
 				if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {
 					//posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
 				}
 				break;
 			case 4:		//DOWN
-				if (DASH_MOVEMENT + dashing_count / DIV >= FALL_STEP) posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				if (DASH_MOVEMENT + dashing_count / (DIV) >= FALL_STEP) posPlayer.y += DASH_MOVEMENT + dashing_count / (DIV);
 				else  posPlayer.y += FALL_STEP;
 				if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {
 					//posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
@@ -182,32 +184,32 @@ void Player::update(int deltaTime)
 				}
 				break;
 			case 5:		//LEFT_DOWN
-				if (DASH_MOVEMENT + dashing_count / DIV >= FALL_STEP) posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+				if (DASH_MOVEMENT + dashing_count / (DIV) >= FALL_STEP) posPlayer.y += DASH_MOVEMENT + dashing_count / (DIV);
 				else  posPlayer.y += FALL_STEP;
 				if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {
 					//posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
 				}
 
-				posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.x -= DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.x += DASH_MOVEMENT + dashing_count / (DIV);
 				}
 				break;
 			case 6:		//LEFT
-				posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.x -= DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.x += DASH_MOVEMENT + dashing_count / (DIV);
 					dashing_count = 1;
 				}
 				break;
 			case 7:		//LEFT_UP
-				posPlayer.x -= DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.x -= DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.x += DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.x += DASH_MOVEMENT + dashing_count / (DIV);
 				}
-				posPlayer.y -= DASH_MOVEMENT + dashing_count / DIV;
+				posPlayer.y -= DASH_MOVEMENT + dashing_count / (DIV);
 				if (map->collisionMoveUp(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.y += DASH_MOVEMENT + dashing_count / DIV;
+					posPlayer.y += DASH_MOVEMENT + dashing_count / (DIV);
 				}
 				break;
 			}
