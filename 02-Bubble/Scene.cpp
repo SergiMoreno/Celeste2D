@@ -298,7 +298,7 @@ void Scene::render(int state)
 		sprite_pantalla->render();
 		break;
 	case 13:		//Instructions
-		spritesheet_pantalla.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
+		spritesheet_pantalla.loadFromFile("images/instruccions.png", TEXTURE_PIXEL_FORMAT_RGBA);
 		sprite_pantalla->render();
 		break;
 	case 12:		//Credits

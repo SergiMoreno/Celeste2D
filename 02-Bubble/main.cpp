@@ -2,12 +2,22 @@
 #include <GL/glut.h>
 #include "Game.h"
 
+#include <stdio.h>
+#include <SDL.h>
+#include <SDL_mixer.h>
+#include <iostream>
+
+#define WIDTH 1280
+#define HEIGHT 720
+
+
 
 //Remove console (only works in Visual Studio)
 #pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
 
 
 #define TIME_PER_FRAME 1000.f / 60.f // Approx. 60 fps
+#define WAV_PATH "music/Ntempo.mp3" //WORK TOTALY FINE
 
 
 static int prevTime;
@@ -79,6 +89,29 @@ static void idleCallback()
 	}
 }
 
+void init_music() {
+	/*Mix_Music* wave = NULL;
+	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
+		//std::cout << "Impossible d'ouvrir mixer " << SDL_GetError() << std::endl;
+	}
+	wave = Mix_LoadMUS(WAV_PATH);
+	if (wave == NULL) {
+		//std::cout << "Impossible de chargé un fichier .ogg " << SDL_GetError() << std::endl;
+	}
+	if (Mix_PlayMusic(wave, 1) != 0) {
+		//std::cout << "Impossible de jouer le fichier " << SDL_GetError() << std::endl;
+	}
+	//SDL_Delay(5000);
+
+	while (Mix_PlayingMusic());
+
+	Mix_FreeMusic(wave);
+	//SDL_DestroyWindow(window);
+	//SDL_Quit();*/
+	if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {}
+		
+
+}
 
 int main(int argc, char **argv)
 {
@@ -102,6 +135,8 @@ int main(int argc, char **argv)
 	glewExperimental = GL_TRUE;
 	glewInit();
 	
+	init_music();
+
 	// Game instance initialization
 	Game::instance().init();
 	prevTime = glutGet(GLUT_ELAPSED_TIME);
