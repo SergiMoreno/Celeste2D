@@ -60,8 +60,8 @@ void Scene::init_player()
 {
 	player = new Player();
 	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
-	posPlayer = map->getInitialPos();
-	player->setPosition(glm::vec2(posPlayer.x * map->getTileSize(), posPlayer.y * map->getTileSize()));
+	initPos = map->getInitialPos();
+	player->setPosition(glm::vec2(initPos.x * map->getTileSize(), initPos.y * map->getTileSize()));
 	player->setTileMap(map);
 	dead = false;
 	vulnerability = true;
@@ -92,6 +92,7 @@ void Scene::update_map(int state) {
 			map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 			//player->setTileMap(map);
 		}
+		//posPlayer = glm::ivec2(0,0)
 		init_player();
 		entity.clear();
 		init_entities();
@@ -117,7 +118,7 @@ void Scene::update(int deltaTime, int state, bool *transition)
 		{
 			if (shake == 0) {
 				jumpAngle += 4;
-				posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
+				posPlayer = glm::vec2(initPos.x * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
 				player->setPosition(posPlayer);
 			}
 			if (jumpAngle > 90) {
@@ -130,7 +131,7 @@ void Scene::update(int deltaTime, int state, bool *transition)
 						else {
 							map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 						}
-						posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
+						posPlayer = glm::vec2(initPos.x * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
 						*transition = false;
 						dead = false;
 						jumpAngle = 180;
@@ -143,7 +144,7 @@ void Scene::update(int deltaTime, int state, bool *transition)
 						else {
 							map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(((shake % 2) * 2 - 1) * 5, (((shake + 1) % 2) * 2 - 1) * 5), texProgram);
 						}
-						posPlayer = glm::vec2(INIT_PLAYER_X_TILES * map->getTileSize() + ((shake % 2) * 2 - 1) * 5, int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)) + (((shake + 1) % 2) * 2 - 1) * 5);
+						posPlayer = glm::vec2(initPos.x * map->getTileSize() + ((shake % 2) * 2 - 1) * 5, int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)) + (((shake + 1) % 2) * 2 - 1) * 5);
 						++shake;
 						break;
 					}
@@ -161,6 +162,8 @@ void Scene::updateEntities(int deltaTime)
 	for (unsigned int i = 0;i < entity.size();i++) {
 		entity[i]->update(deltaTime);
 		switch (entities[i]) {
+		case 13:
+		case 14:
 		case 0:
 			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28)) && !dead) {
 				dead = true;

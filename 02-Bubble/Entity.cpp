@@ -7,7 +7,7 @@
 
 enum EntityType
 {
-	SPIKE, STRAWBERRY, L_WING, R_WING, KEY, CHEST, BALLOON, STRING, L_CLOUD, R_CLOUD, BOX, TRAMPOLINE, FLAG, MAX_ENTITIES
+	SPIKE, STRAWBERRY, L_WING, R_WING, KEY, CHEST, BALLOON, STRING, L_CLOUD, R_CLOUD, BOX, TRAMPOLINE, FLAG, L_SPIKE, R_SPIKE, MAX_ENTITIES
 };
 
 
@@ -21,6 +21,16 @@ void Entity::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram, in
 	type = entity;
 
 	switch (type) {
+	case L_SPIKE:
+		sprite->setNumberAnimations(1);
+		sprite->setAnimationSpeed(0, 8);
+		sprite->addKeyframe(0, glm::vec2(3 * dimx, 3 * dimy));
+		break;
+	case R_SPIKE:
+		sprite->setNumberAnimations(1);
+		sprite->setAnimationSpeed(0, 8);
+		sprite->addKeyframe(0, glm::vec2(4 * dimx, 3 * dimy));
+		break;
 	case SPIKE:
 		sprite->setNumberAnimations(1);
 		sprite->setAnimationSpeed(0, 8);

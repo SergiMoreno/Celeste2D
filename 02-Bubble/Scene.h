@@ -40,7 +40,7 @@ private:
 private:
 	TileMap *map;
 	Player *player;
-	glm::ivec2 posPlayer;
+	glm::ivec2 posPlayer, initPos;
 	std::vector<Entity*> entity;
 	std::vector<int> entities;
 	ShaderProgram texProgram;
