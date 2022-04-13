@@ -29,6 +29,7 @@
 *		- Claus
 *		- Tresors
 *		- Globus i corda
+*   - Trampolín
 *		- Bandera
 *	· Animacions de idle, córrer, saltar i reviure del personatge.
 *	· Moviments de mirar cap adalt i ajupir-se.
