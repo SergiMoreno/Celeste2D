@@ -30,6 +30,7 @@ public:
 	void setInfinity_dash(bool d);
 	bool getInfinity_dash();
 	void trampoline();
+	void dash(int *dashing_count, int direction);
 
 	bool looksLeft();
 	bool looksRight();
@@ -37,7 +38,7 @@ public:
 private:
 	bool bJumping, bDashing, cReleased, sPressed ,fromWall, bMoving, bClimbing, xReleased, dPressed;
 	glm::ivec2 tileMapDispl, posPlayer;
-	int jumpAngle, startY, dimyPlayer, dimxPlayer, direction, dashing_count, dash_direction, walking, climbing, wallAngle, otherY;
+	int jumpAngle, startY, dimyPlayer, dimxPlayer, direction, dashing_count, dash_direction, climb_count, climb_direction, walking, climbing, wallAngle, otherY;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;
