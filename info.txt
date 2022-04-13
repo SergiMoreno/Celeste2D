@@ -1,54 +1,54 @@
 * * * * * * * * * * * * * * * * * * * * * * CELESTE * * * * * * * * * * * * * * * * * * * * * * *
-*									*
-* Team members:												*
-* 	David Cano Cañardo											*
-*	Sergio Moreno Pérez											*
-*														*
-* Funcionalitats bàsiques implementades:									*
-*	· Joc amb 4 pantalles -> menú, joc, intruccions i crèdits.					*
-*	· Nivells del Celeste original: 10 nivells + 1 de victòria.					*
-*	· Mecàniques de Jump, Dash i Climb.								*
-*	· Apareixen maduixes que augmentaran la puntuació total del jugador.				*
-*	  Quan el jugador agafi una maduixa, apareixerà un contador de la puntuació			*
-*	  durant uns instants de temps.									*
-*	  Una vegada el jugador hagi guanyat, apareixerà a la pantalla de crèdits			*
-*	  la puntuació total obtinguda.									*
-*	· La Madeline mor en sortir de la pantalla, reiniciant el nivell actual.			*
-*	· Decoracions: flors i plantes.									*
-*	· Invulnerabilitat.											*
-*	· Reduir velocitat del joc.										*
-*	· Dash infinit.											*
-*	· Saltar entre pantalles.										*
-*														*
-* Funcionalitats de polish implementades:									*
-*	· So: música de fons.										*
-*	· Capa background: núvols. Capa de foreground: neu.						*
-*	· Interactivitat amb:										*
-*		- Pinxos											*
-*		- Maduixes: amb i sense ales								*
-*		- Claus											*
-*		- Tresors											*
-*		- Globus i corda										*
-*		- Bandera											*
-*	· Animacions de idle, córrer, saltar i reviure del personatge.				*
-*	· Moviments de mirar cap adalt i ajupir-se.							*
-*	· Pols quan caminem.											*
-*	· Tremolor de la càmera.										*
-*														*
-* Instruccions del joc:											*
-*	· Moviments bàsics:											*
-*		- 'c' -> salt											*
-*		- 'x' -> dash											*
-*		- '->' -> moviment lateral dret								*
-*		- '<-' -> moviment lateral esquerre							*
-*	· Moviments avançats:										*
-*		- Col·lisió amb paret + 'c' -> climb							*
-*	· Moviments de Déu:											*
-*		- '1','2',...,'9','0' -> anar al lvl del número						*
-*		  En cas de pitjar el '0', saltaríem al lvl 10.						*
-*		  Per accedir al lvl 11 s'ha de fer a través de saltar al lvl 10 i superant-lo.	*
-*		- 'd' -> dash infinit. Cada vegada es pitgi la 'd', el personatge farà un dash.	*
-*		- 's' -> slow motion. Si es pitja la 's', la velocitat del joc es redueix a 	*
-*			  la meitat. En tornar a pitjar la velocitat seria la inicial.		*
-*		- 'g' -> invulnerabilitat									*
+*
+* Team members:
+* 	David Cano Cañardo
+*	Sergio Moreno Pérez
+*
+* Funcionalitats bàsiques implementades:
+*	· Joc amb 4 pantalles -> menú, joc, intruccions i crèdits.
+*	· Nivells del Celeste original: 10 nivells + 1 de victòria.
+*	· Mecàniques de Jump, Dash i Climb.
+*	· Apareixen maduixes que augmentaran la puntuació total del jugador.
+*	  Quan el jugador agafi una maduixa, apareixerà un contador de la puntuació
+*	  durant uns instants de temps.
+*	  Una vegada el jugador hagi guanyat, apareixerà a la pantalla de crèdits
+*	  la puntuació total obtinguda.
+*	· La Madeline mor en sortir de la pantalla, reiniciant el nivell actual.
+*	· Decoracions: flors i plantes.
+*	· Invulnerabilitat.
+*	· Reduir velocitat del joc.
+*	· Dash infinit.
+*	· Saltar entre pantalles.
+*	
+* Funcionalitats de polish implementades:
+*	· So: música de fons. Hem fet servir la llibrería SDL_mixer
+*	· Capa background: núvols. Capa de foreground: neu.
+*	· Interactivitat amb:
+*		- Pinxos
+*		- Maduixes: amb i sense ales
+*		- Claus
+*		- Tresors
+*		- Globus i corda
+*		- Bandera
+*	· Animacions de idle, córrer, saltar i reviure del personatge.
+*	· Moviments de mirar cap adalt i ajupir-se.
+*	· Pols quan caminem.
+*	· Tremolor de la càmera.
+*
+* Instruccions del joc:
+*	· Moviments bàsics:
+*		- 'c' -> salt
+*		- 'x' -> dash
+*		- '->' -> moviment lateral dret
+*		- '<-' -> moviment lateral esquerre
+*	· Moviments avançats:
+*		- Col·lisió amb paret + 'c' -> climb
+*	· Moviments de Déu:
+*		- '1','2',...,'9','0' -> anar al lvl del número
+*		  En cas de pitjar el '0', saltaríem al lvl 10.
+*		  Per accedir al lvl 11 s'ha de fer a través de saltar al lvl 10 i superant-lo.
+*		- 'd' -> dash infinit. Cada vegada es pitgi la 'd', el personatge farà un dash.
+*		- 's' -> slow motion. Si es pitja la 's', la velocitat del joc es redueix a
+*			  la meitat. En tornar a pitjar la velocitat seria la inicial.
+*		- 'g' -> invulnerabilitat
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
