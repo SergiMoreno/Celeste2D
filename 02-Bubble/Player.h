@@ -40,7 +40,7 @@ public:
 private:
 	bool bJumping, bDashing, cReleased, sPressed ,fromWall, bMoving, bClimbing, xReleased, dPressed;
 	glm::ivec2 tileMapDispl, posPlayer;
-	int jumpAngle, startY, dimyPlayer, dimxPlayer, direction, dashing_count, dash_direction, climb_count, climb_direction, walking, climbing, wallAngle, otherY;
+	int jumpAngle, startY, dimyPlayer, dimxPlayer, direction, dashing_count, dash_direction, climb_count, climb_direction, walking, climbing, wallAngle, otherY,shake;
 	Texture spritesheet;
 	Sprite *sprite;
 	TileMap *map;

@@ -45,6 +45,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	fromWall = false;
 	dashing_count = 0;
 	climb_count = 0;
+	shake = 3;
 	walking = 0;
 	transicion = 0;
 	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -103,7 +104,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	sprite->setAnimationSpeed(CLIMBING_LOOK_LEFT, 8);
 	sprite->addKeyframe(CLIMBING_LOOK_LEFT, glm::vec2(dimx, 5 * dimy));
 
-	sprite->changeAnimation(0);
+	sprite->changeAnimation(1);
 	tileMapDispl = tileMapPos;
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
 }
@@ -115,6 +116,8 @@ void Player::update(int deltaTime)
 	int initA = jumpAngle;
 	int initx = posPlayer.x;
 	sprite->update(deltaTime);
+
+//	if (shake<3) 		Scene::instance().shaking(&shake,&posPlayer.x , &posPlayer.y);
 
 	if (Game::instance().getKey('s') || Game::instance().getKey('S')) sPressed = true;
 
@@ -151,6 +154,7 @@ void Player::update(int deltaTime)
 
 	if (bDashing) {
 		if (dashing_count == 0) {
+			//shake = 0;
 			dash_direction = direction;
 			dashing_count = 24 * slowmo;
 		}
@@ -319,8 +323,14 @@ void Player::update(int deltaTime)
 				}
 			}
 			if (climb_count == 0) {
-				if ((direction == RIGHT) || (direction == RIGHT_UP) || (direction == RIGHT_DOWN)) climb_direction = LEFT;
-				else climb_direction = RIGHT;
+				if ((direction == RIGHT) || (direction == RIGHT_UP) || (direction == RIGHT_DOWN)) {
+					climb_direction = LEFT;
+					sprite->changeAnimation(JUMPING_LEFT);
+				}
+				else {
+					climb_direction = RIGHT;
+					sprite->changeAnimation(JUMPING_RIGHT);
+				}
 				climb_count = 20 * slowmo;
 				bJumping = true;
 				startY = posPlayer.y;
@@ -328,6 +338,11 @@ void Player::update(int deltaTime)
 			else if (climb_count != 1) {
 				--climb_count;
 				dash(&climb_count, climb_direction);
+				if (climb_direction == LEFT) sprite->changeAnimation(JUMPING_LEFT);
+				else sprite->changeAnimation(JUMPING_RIGHT);
+				//if (dashing_count < 6) {
+				//	posPlayer.y += 10 / dashing_count;
+				//}
 			}
 			else {
 				bClimbing = false;
