@@ -1,5 +1,5 @@
 * * * * * * * * * * * * * * * * * * * * * * CELESTE * * * * * * * * * * * * * * * * * * * * * * *
-*													*
+*									*
 * Team members:												*
 * 	David Cano Cañardo											*
 *	Sergio Moreno Pérez											*
