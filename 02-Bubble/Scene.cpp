@@ -281,7 +281,8 @@ void Scene::render(int state)
 		}
 		sprite_credits->render();
 		message = "Final Score: ";
-		message += std::to_string(player->getScore());
+		text.render(message, glm::vec2(10, SCREEN_HEIGHT - 60), 32, glm::vec4(1, 0, 0, 1));
+		message = std::to_string(player->getScore());
 		text.render(message, glm::vec2(10, SCREEN_HEIGHT - 20), 32, glm::vec4(1, 0, 0, 1));
 		break;
 	default:
@@ -295,20 +296,20 @@ void Scene::render(int state)
 		map->render();
 		player->render();
 		for (unsigned int i = 0;i < entity.size();i++) entity[i]->render();
+		sprite_snow1->setPosition(glm::vec2(-512 + int((currentTime / 3)) % 1024, sin(currentTime / 200) * 20));
+		sprite_snow1->render();
+		sprite_snow2->setPosition(glm::vec2(-512 + int((currentTime * 0.8 / 3)) % 1024, sin(currentTime * 0.8 / 200) * 20));
+		sprite_snow2->render();
+		sprite_snow3->setPosition(glm::vec2(-512 + int(currentTime / 3 + 512) % 1024, sin(currentTime / 200) * 20));
+		sprite_snow3->render();
+		sprite_snow4->setPosition(glm::vec2(-512 + int(currentTime * 0.8 / 3 + 512) % 1024, sin(currentTime * 0.2 / 200) * 20));
+		sprite_snow4->render();
 		if (showScore > 0) {
 			message = "Score: ";
 			message += std::to_string(player->getScore());
 			text.render(message, glm::vec2(10, SCREEN_HEIGHT - 20), 32, glm::vec4(1, 0, 0, 1));
 			showScore--;
 		}
-		sprite_snow1->setPosition(glm::vec2(-512 + int((currentTime / 3)) % 1024, sin(currentTime / 200) * 20));
-		sprite_snow1->render();
-		sprite_snow2->setPosition(glm::vec2(-512 + int((currentTime*0.8 / 3)) % 1024, sin(currentTime * 0.8 / 200) * 20));
-		sprite_snow2->render();
-		sprite_snow3->setPosition(glm::vec2(-512 + int(currentTime / 3 + 512) % 1024, sin(currentTime / 200) * 20));
-		sprite_snow3->render();
-		sprite_snow4->setPosition(glm::vec2(-512 + int(currentTime*0.8 / 3 + 512) % 1024, sin(currentTime * 0.2 / 200) * 20));
-		sprite_snow4->render();
 		break;
 	}
 }

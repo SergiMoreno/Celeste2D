@@ -92,44 +92,9 @@ static void idleCallback()
 
 void init_music() {
 	Mix_Music* wave = NULL;
-	if (Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) != 0) {
-		//std::cout << "Impossible d'ouvrir mixer " << SDL_GetError() << std::endl;
-	}
+	Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096);
 	wave = Mix_LoadMUS(WAV_PATH);
-	if (wave == NULL) {
-		//std::cout << "Impossible de chargé un fichier .ogg " << SDL_GetError() << std::endl;
-	}
-	if (Mix_PlayMusic(wave, -1) != 0) {
-		//std::cout << "Impossible de jouer le fichier " << SDL_GetError() << std::endl;
-	}
-	//SDL_Delay(5000);
-
-	//while (Mix_PlayingMusic());
-
-	//Mix_FreeMusic(wave);
-	//SDL_DestroyWindow(window);
-	//SDL_Quit();*/
-	//if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {}
-	/*
-	SDL_Init(SDL_INIT_EVERYTHING);
-
-	SDL_AudioSpec wavSpec;
-	Uint32 wavLength;
-	Uint8* wavBuffer;
-	SDL_LoadWAV(WAV_PATH, &wavSpec, &wavBuffer, &wavLength);
-
-	SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-
-	int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-	SDL_PauseAudioDevice(deviceId, 0);
-
-	while (Mix_PlayingMusic());
-
-
-	SDL_CloseAudioDevice(deviceId);
-	SDL_FreeWAV(wavBuffer);
-	SDL_Quit();*/
-
+	Mix_PlayMusic(wave, -1);
 }
 
 int main(int argc, char **argv)
