@@ -26,8 +26,12 @@ public:
 	int getHideBalloon();
 	void transformChest();
 	void eliminar();
+	void onTrampoline();
+	void notOnTrampoline();
 
 	bool collisionEntity(const glm::ivec2& pos, const glm::ivec2& size) const;
+	//bool collisionBox(const glm::ivec2& pos, const glm::ivec2& size) const;
+	bool collisionCloud(const glm::ivec2& pos, const glm::ivec2& size) const;
 
 private:
 	glm::ivec2 tileMapDispl, posEntity, size;
@@ -35,7 +39,7 @@ private:
 	Sprite* sprite;//, sprite2, sprite3;
 	TileMap* map;
 	bool up;
-	int currentDisp, hideBalloon;
+	int currentDisp, hideBalloon, trampolineDown;
 	bool elim;//, transformChest;
 	int type;
 };

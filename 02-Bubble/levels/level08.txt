@@ -3,7 +3,6 @@ TILEMAP
 32 32							-- Tile size & block size
 images/walls.png 	-- Tilesheet
 1 14							-- Initial player position
-3 0							-- Win position
 8 5 								-- Number of tiles in tilesheet
 10  32  32  32  32  13  14  14  14   9  11   9   9   9   9   9
 10  32  33  32  32  32  30  30  32  13  14  14  14  14   9   9

@@ -30,6 +30,8 @@ public:
 	void setInfinity_dash(bool d);
 	bool getInfinity_dash();
 	void trampoline();
+	void cloud();
+	void notCloud();
 	void dash(int *dashing_count, int direction);
 
 	bool looksLeft();
@@ -43,7 +45,7 @@ private:
 	Sprite *sprite;
 	TileMap *map;
 	int score;
-	bool arriba, infinity_dash, onTrampoline;
+	bool arriba, infinity_dash, onTrampoline, onCloud;
 	int posInicial;
 	int transicion;
 	int slowmo;

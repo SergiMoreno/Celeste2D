@@ -33,7 +33,6 @@ public:
 	int getTileSize() const { return tileSize; }
 	glm::ivec2 getInitialPos();
 	std::vector<int> getEntities();
-	//int* getEntities();
 	std::vector<int> getPosx();
 	std::vector<int> getPosy();
 
@@ -50,13 +49,12 @@ private:
 	GLuint vao;
 	GLuint vbo;
 	GLint posLocation, texCoordLocation;
-	glm::ivec2 position, mapSize, tilesheetSize, playerPos, victoryPos;
+	glm::ivec2 position, mapSize, tilesheetSize, playerPos;
 	int tileSize, blockSize;
 	Texture tilesheet;
 	glm::vec2 tileTexSize;
 	int *map;
 	std::vector<int> entities, positionx, positiony;
-
 };
 
 

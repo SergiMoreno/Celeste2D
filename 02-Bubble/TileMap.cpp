@@ -79,9 +79,6 @@ bool TileMap::loadLevel(const string &levelFile)
 	sstream >> playerPos.x >> playerPos.y;
 	getline(fin, line);
 	sstream.str(line);
-	sstream >> victoryPos.x >> victoryPos.y;
-	getline(fin, line);
-	sstream.str(line);
 	sstream >> tilesheetSize.x >> tilesheetSize.y;
 	tileTexSize = glm::vec2(1.f / tilesheetSize.x, 1.f / tilesheetSize.y);
 	

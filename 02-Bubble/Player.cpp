@@ -38,6 +38,7 @@ void Player::init(const glm::ivec2& tileMapPos, ShaderProgram& shaderProgram)
 	bMoving = false;
 	dPressed = false;
 	onTrampoline = false;
+	onCloud = false;
 	slowmo = 1;
 	infinity_dash = false;
 	//hasCollision = false;
@@ -156,9 +157,6 @@ void Player::update(int deltaTime)
 		else if (dashing_count != 1) {
 			--dashing_count;
 			dash(&dashing_count, dash_direction);
-			//if (dashing_count < 6) {
-			//	posPlayer.y += 10 / dashing_count;
-			//}
 		}
 	}
 
@@ -213,14 +211,11 @@ void Player::update(int deltaTime)
 		}
 		else if (!bJumping && !bClimbing)
 		{
-			if (looksLeft())//&& (sprite->animation() != JUMPING_LEFT || sprite->animation() != CLIMBING_LOOK_LEFT)
+			if (looksLeft())
 				sprite->changeAnimation(STAND_LEFT);
 			else if (looksRight())
 				sprite->changeAnimation(STAND_RIGHT);
 		}
-
-		//if (hasCollision) bJumping = false;
-		//else bClimbing = false;
 
 		if (bJumping)
 		{
@@ -233,19 +228,18 @@ void Player::update(int deltaTime)
 				if (jumpAngle == 180)
 				{
 					bJumping = false;
+					onTrampoline = false;
 					jumpAngle = 0;
-					// posPlayer.y = startY;
 				}
 				else
 				{
-					// CHECK TRAMPOLINE -150
 					if (!onTrampoline) posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
 					else {
 						posPlayer.y = int(startY - 150 * sin(3.14159f * jumpAngle / 180.f));
-						onTrampoline = false;
 					}
-					if (jumpAngle > 90) // falling
+					if (jumpAngle > 90) {// falling
 						bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
+					}
 				}
 
 				if ((Game::instance().getKey('x') || Game::instance().getKey('X')) && (xReleased || infinity_dash))
@@ -271,7 +265,7 @@ void Player::update(int deltaTime)
 					bDashing = false;
 					dashing_count = 0;
 				}
-				if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased)) //&& !bClimbing && !hasCollision)
+				if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
 				{
 					bJumping = true;
 					jumpAngle = 0;
@@ -280,14 +274,29 @@ void Player::update(int deltaTime)
 					if (looksLeft()) sprite->changeAnimation(JUMPING_LEFT);
 					else sprite->changeAnimation(JUMPING_RIGHT);
 				}
-				/*else if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased) && hasCollision)
-				{
-					bClimbing = true;
-					cReleased = false;
-				}*/
+				if (!bJumping && !bDashing) {
+					if (Game::instance().getSpecialKey(GLUT_KEY_UP)) {
+						if (looksLeft())
+							sprite->changeAnimation(LOOK_LEFT_UP);
+						else if (looksRight())
+							sprite->changeAnimation(LOOK_RIGHT_UP);
+					}
+					else if (Game::instance().getSpecialKey(GLUT_KEY_DOWN)) {
+						if (looksLeft())
+							sprite->changeAnimation(LOOK_LEFT_DOWN);
+						else if (looksRight())
+							sprite->changeAnimation(LOOK_RIGHT_DOWN);
+					}
+					else {
+						if (looksLeft())
+							sprite->changeAnimation(STAND_LEFT);
+						else if (looksRight())
+							sprite->changeAnimation(STAND_RIGHT);
+					}
+				}
+				onTrampoline = false;
 			}
 			else {
-				//if (hasCollision) bClimbing = true;
 				if (looksLeft()) sprite->changeAnimation(JUMPING_LEFT);
 				else sprite->changeAnimation(JUMPING_RIGHT);
 			}
@@ -296,6 +305,7 @@ void Player::update(int deltaTime)
 			{
 				bDashing = true;
 				bJumping = false;
+				onTrampoline = false;
 				jumpAngle = 0;
 				xReleased = false;
 			}
@@ -318,57 +328,11 @@ void Player::update(int deltaTime)
 			else if (climb_count != 1) {
 				--climb_count;
 				dash(&climb_count, climb_direction);
-				//if (dashing_count < 6) {
-				//	posPlayer.y += 10 / dashing_count;
-				//}
 			}
 			else {
 				bClimbing = false;
 				climb_count = 0;
 			}
-			/*jumpAngle = initA + JUMP_ANGLE_STEP;
-			if (!hasCollision) bClimbing = false;
-			else {
-				if (looksLeft()) sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
-				else sprite->changeAnimation(CLIMBING_LOOK_LEFT);
-				posPlayer.y = init - 1;
-				if (map->collisionMoveUp(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer))) {
-					posPlayer.y = init + 2;
-					jumpAngle = 120; // 4*23
-					hasCollision = false;
-				}
-				else {
-					if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
-					{
-						fromWall = true;
-						hasCollision = false;
-						wallAngle = 90;
-						otherY = init;
-						cReleased = false;
-						transicion = 100;
-						//posPlayer.y = init + 1;
-						//if (!map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {}
-						if (looksLeft()) {
-							initx -= 2;
-							sprite->changeAnimation(JUMPING_LEFT);
-							Game::instance().specialKeyReleased(GLUT_KEY_RIGHT);
-						}
-						else {
-							initx += 2;
-							sprite->changeAnimation(JUMPING_RIGHT);
-						}
-					}
-					else {
-						//if (looksLeft()) sprite->changeAnimation(CLIMBING_LOOK_RIGHT);
-						//else sprite->changeAnimation(CLIMBING_LOOK_LEFT);
-					}
-				}
-				if (jumpAngle > 120)
-				{
-					bClimbing = false;
-					jumpAngle = 0;
-				}
-			}*/
 		}
 		else if (hasCollision && (jumpAngle == 0 || jumpAngle > 90)) {
 
@@ -382,64 +346,8 @@ void Player::update(int deltaTime)
 					climb_count = 0;
 					cReleased = false;
 				}
-				/*
-				if ((Game::instance().getKey('C') || Game::instance().getKey('c')) && (cReleased))
-				{
-					fromWall = true;
-					hasCollision = false;
-					wallAngle = 90;
-					otherY = init;
-					cReleased = false;
-					transicion = 100;
-					//posPlayer.y = init + 1;
-					//if (!map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y)) {}
-					if (looksLeft()) {
-						initx -= 2;
-						sprite->changeAnimation(JUMPING_LEFT);
-						direction = 1;
-						Game::instance().specialKeyReleased(GLUT_KEY_RIGHT);
-					}
-					else {
-						initx += 2;
-						direction = 2;
-						sprite->changeAnimation(JUMPING_RIGHT);
-						Game::instance().specialKeyReleased(GLUT_KEY_LEFT);
-					}
-				}*/
-
 			}
 		}
-		/*
-		if (fromWall && !hasCollision) {
-			wallAngle += JUMP_ANGLE_STEP;
-			if (direction == 1) {
-				posPlayer.x = initx - 1;
-				if (map->collisionMoveLeft(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
-				{
-					posPlayer.x += 1;
-					fromWall = false;
-				}
-
-				sprite->changeAnimation(JUMPING_LEFT);
-			}
-			else if (direction == 2) {
-				posPlayer.x = initx + 1;
-				if (map->collisionMoveRight(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer)))
-				{
-					posPlayer.x -= 1;
-					fromWall = false;
-				}
-				//posPlayer.y = init - 1;
-				sprite->changeAnimation(JUMPING_RIGHT);
-			}
-			//if (transicion != 0) {
-			posPlayer.y = init - 1;
-			transicion -= 2;
-			//}
-			//else posPlayer.y = int(otherY - 96 * sin(3.14159f * wallAngle / 180.f));
-			if (map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y))
-				fromWall = false;
-		}*/
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
@@ -521,6 +429,19 @@ int Player::getScore()
 void Player::trampoline()
 {
 	onTrampoline = true;
+	bJumping = true;
+	jumpAngle = 0;
+	startY = posPlayer.y;
+}
+
+void Player::cloud()
+{
+	onCloud = true;
+}
+
+void Player::notCloud()
+{
+	onCloud = false;
 }
 
 void Player::dash(int* dashing_count, int direction) {

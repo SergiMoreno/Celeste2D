@@ -225,13 +225,16 @@ void Scene::updateEntities(int deltaTime)
 		case 6:
 			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28)) && entity[i]->getHideBalloon() == 0) {
 				entity[i]->setHideBalloon();
-				player->resetJump();
+				player->resetDash();
 			}
 			break;
 		case 8:
-
-			break;
 		case 9:
+			if (entity[i]->collisionCloud(pos, glm::vec2(28, 28))) {
+				player->cloud();
+			} else {
+				player->notCloud();
+			}
 			break;
 		case 10:
 			/*if (entity[i]->collisionBox(pos, glm::vec2(28, 28))) {
@@ -241,6 +244,10 @@ void Scene::updateEntities(int deltaTime)
 		case 11:
 			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
 				player->trampoline();
+				entity[i]->onTrampoline();
+			}
+			else {
+				entity[i]->notOnTrampoline();
 			}
 			break;
 		case 12:
