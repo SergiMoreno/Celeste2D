@@ -31,6 +31,16 @@ void Scene::init()
 	spritesheet_credits.loadFromFile("images/credits.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite_credits = Sprite::createSprite(glm::ivec2(512, 1024), glm::vec2(1, 1), &spritesheet_credits, &texProgram);
 
+	spritesheet_snow1.loadFromFile("images/snow1.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite_snow1 = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_snow1, &texProgram);
+	spritesheet_snow2.loadFromFile("images/snow2.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite_snow2 = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_snow2, &texProgram);
+	spritesheet_snow3.loadFromFile("images/snow3.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite_snow3 = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_snow3, &texProgram);
+	spritesheet_snow4.loadFromFile("images/snow4.png", TEXTURE_PIXEL_FORMAT_RGBA);
+	sprite_snow4 = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_snow4, &texProgram);
+
+
 
 	spritesheet_pantalla.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	sprite_pantalla = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_pantalla, &texProgram);
@@ -279,6 +289,14 @@ void Scene::render(int state)
 		}
 		break;
 	}
+	sprite_snow1->setPosition(glm::vec2(-512+int((currentTime/3))%1024, sin(currentTime/200)*20));
+	sprite_snow1->render();
+	sprite_snow2->setPosition(glm::vec2(-512+int((currentTime/3))%1024, sin(currentTime*0.8 / 200) * 20));
+	sprite_snow2->render();
+	sprite_snow3->setPosition(glm::vec2(-512+int(currentTime/3+512)%1024, sin(currentTime / 200) * 20));
+	sprite_snow3->render();
+	sprite_snow4->setPosition(glm::vec2(-512+int(currentTime/3+512)%1024, sin(currentTime * 0.2 / 200) * 20));
+	sprite_snow4->render();
 }
 
 void Scene::re_init_credits() {
