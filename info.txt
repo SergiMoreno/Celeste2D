@@ -29,8 +29,10 @@
 *		- Claus
 *		- Tresors
 *		- Globus i corda
-*   - Trampolín
+*         - Trampolín
 *		- Bandera
+*         - (Només s'ha implementat el moviment dels núvols i l'aparició de les caixes,
+*            no tenen interactivitat)
 *	· Animacions de idle, córrer, saltar i reviure del personatge.
 *	· Moviments de mirar cap adalt i ajupir-se.
 *	· Pols quan caminem.
