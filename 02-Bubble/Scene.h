@@ -57,12 +57,20 @@ private:
 	Texture spritesheet_snow2;
 	Texture spritesheet_snow3;
 	Texture spritesheet_snow4;
+	Texture spritesheet_pols1;
+	Texture spritesheet_pols2;
+	Texture spritesheet_pols3;
+	Texture spritesheet_pols4;
 	Sprite* sprite_pantalla;
 	Sprite* sprite_credits;
 	Sprite* sprite_snow1;
 	Sprite* sprite_snow2;
 	Sprite* sprite_snow3;
 	Sprite* sprite_snow4;
+	Sprite* sprite_pols1;
+	Sprite* sprite_pols2;
+	Sprite* sprite_pols3;
+	Sprite* sprite_pols4;
 	int num;
 };
 
