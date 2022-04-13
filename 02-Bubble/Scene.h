@@ -7,6 +7,7 @@
 #include "TileMap.h"
 #include "Player.h"
 #include "Entity.h"
+#include "Text.h"
 
 // Scene contains all the entities of our game.
 // It is responsible for updating and render them.
@@ -45,9 +46,10 @@ private:
 	std::vector<int> entities;
 	ShaderProgram texProgram;
 	float currentTime;
-	int jumpAngle, startY, shake, creditant;
+	int jumpAngle, startY, shake, creditant, showScore;
 	glm::mat4 projection;
 	bool dead, vulnerability;
+	Text text;
 
 	Texture spritesheet_pantalla;
 	Texture spritesheet_credits;

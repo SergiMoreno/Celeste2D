@@ -36,13 +36,14 @@ void Player::init(const glm::ivec2 &tileMapPos, ShaderProgram &shaderProgram)
 	bDashing = false;
 	bClimbing = false;
 	bMoving = false;
+	dPressed = false;
+	onTrampoline = false;
 	slowmo = 1;
 	infinity_dash = false;
 	//hasCollision = false;
 	fromWall = false;
 	dashing_count = 0;
 	walking = 0;
-	score = 0;
 	transicion = 0;
 	spritesheet.loadFromFile("images/player.png", TEXTURE_PIXEL_FORMAT_RGBA);
 	float dimx = 8.f / 24.f;
@@ -127,6 +128,17 @@ void Player::update(int deltaTime)
 				break;
 			}
 			sPressed = false;
+	}
+
+	if (!Game::instance().getKey('d') && !Game::instance().getKey('D')) dPressed = false;
+
+	if ((Game::instance().getKey('d') || Game::instance().getKey('D')) && !dPressed) {
+		dashing_count = 0;
+		bDashing = true;
+		bJumping = false;
+		//xReleased = false;
+		dPressed = true;
+		//infinity_dash = true;
 	}
 
 	if (!Game::instance().getKey('c') && !Game::instance().getKey('C')) cReleased = true;
@@ -295,7 +307,12 @@ void Player::update(int deltaTime)
 				}
 				else
 				{
-					posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
+					// CHECK TRAMPOLINE -150
+					if (!onTrampoline) posPlayer.y = int(startY - 96 * sin(3.14159f * jumpAngle / 180.f));
+					else {
+						posPlayer.y = int(startY - 150 * sin(3.14159f * jumpAngle / 180.f));
+						onTrampoline = false;
+					}
 					if (jumpAngle > 90) // falling
 						bJumping = !map->collisionMoveDown(posPlayer, glm::ivec2(dimxPlayer, dimyPlayer), &posPlayer.y);
 				}
@@ -305,6 +322,7 @@ void Player::update(int deltaTime)
 					bDashing = true;
 					bJumping = false;
 					xReleased = false;
+					//dashing_count = 0;
 				}
 			}
 			else {
@@ -346,6 +364,7 @@ void Player::update(int deltaTime)
 				bDashing = true;
 				bJumping = false;
 				xReleased = false;
+				//dashing_count = 0;
 			}
 		}
 
@@ -460,7 +479,11 @@ void Player::update(int deltaTime)
 	}
 
 	sprite->setPosition(glm::vec2(float(tileMapDispl.x + posPlayer.x), float(tileMapDispl.y + posPlayer.y)));
-	if (posPlayer.y < -dimyPlayer) Game::instance().canviDestat();
+	if (posPlayer.y < -dimyPlayer/2) 
+		Game::instance().canviDestat();
+	/*else {
+		glm::ivec2 victoryPos = map->g;
+	}*/
 }
 
 void Player::render()
@@ -494,9 +517,25 @@ void Player::resetJump() {
 	}
 }
 
+void Player::resetDash()
+{
+	dashing_count = 0;
+	bDashing = false;
+}
+
+void Player::initScore()
+{
+	score = 0;
+}
+
 void Player::increaseScore()
 {
 	score += 1000;
+}
+
+int Player::getScore()
+{
+	return score;
 }
 
 void Player::setInfinity_dash(bool d)
@@ -507,6 +546,11 @@ void Player::setInfinity_dash(bool d)
 bool Player::getInfinity_dash()
 {
 	return infinity_dash;
+}
+
+void Player::trampoline()
+{
+	onTrampoline = true;
 }
 
 bool Player::looksLeft()

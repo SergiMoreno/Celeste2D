@@ -8,9 +8,6 @@
 #define SCREEN_X 0//64
 #define SCREEN_Y 0//16
 
-#define INIT_PLAYER_X_TILES 1//2//0
-#define INIT_PLAYER_Y_TILES 14//14//11
-
 
 Scene::Scene()
 {
@@ -39,13 +36,12 @@ void Scene::init()
 	sprite_pantalla = Sprite::createSprite(glm::ivec2(512, 512), glm::vec2(1, 1), &spritesheet_pantalla, &texProgram);
 	sprite_pantalla->setPosition(glm::vec2(0, 0));
 
-
-	/*spritesheet.loadFromFile("images/title.png", TEXTURE_PIXEL_FORMAT_RGBA);
-	sprite = Sprite::createSprite(glm::ivec2(32, 32), glm::vec2(1, 1), &spritesheet, &texProgram);
-	sprite->setNumberAnimations(1);
-	*/
 	map = TileMap::createTileMap("levels/level01.txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
+	player = new Player();
+	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	player->initScore();
 	init_player();
+	vulnerability = true;
 	init_entities();
 
 	projection = glm::ortho(0.f, float(SCREEN_WIDTH - 1), float(SCREEN_HEIGHT - 1), 0.f);
@@ -54,17 +50,24 @@ void Scene::init()
 	jumpAngle = 180;
 	shake = 0;
 	creditant = 0;
+	showScore = 0;
+
+	// Select which font you want to use
+	if (!text.init("fonts/OpenSans-Regular.ttf"))
+		//if(!text.init("fonts/OpenSans-Bold.ttf"))
+		//if(!text.init("fonts/DroidSerif.ttf"))
+		cout << "Could not load font!!!" << endl;
 }
 
 void Scene::init_player()
 {
-	player = new Player();
-	player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
+	//player = new Player();
+	//player->init(glm::ivec2(SCREEN_X, SCREEN_Y), texProgram);
 	initPos = map->getInitialPos();
 	player->setPosition(glm::vec2(initPos.x * map->getTileSize(), initPos.y * map->getTileSize()));
 	player->setTileMap(map);
 	dead = false;
-	vulnerability = true;
+	//vulnerability = true;
 }
 
 void Scene::init_entities()
@@ -131,9 +134,9 @@ void Scene::update(int deltaTime, int state, bool *transition)
 						else {
 							map = TileMap::createTileMap("levels/level" + to_string(state) + ".txt", glm::vec2(SCREEN_X, SCREEN_Y), texProgram);
 						}
-						posPlayer = glm::vec2(initPos.x * map->getTileSize(), int(startY - 4 * 40 * sin(3.14159f * jumpAngle / 180.f)));
+						init_player();
+						player->resetDash();
 						*transition = false;
-						dead = false;
 						jumpAngle = 180;
 						shake = 0;
 						break;
@@ -172,6 +175,7 @@ void Scene::updateEntities(int deltaTime)
 		case 1:
 			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
 				player->increaseScore();
+				showScore = 100;
 				entity.erase(entity.begin() + i);
 				entities.erase(entities.begin() + i);
 				if (entities[i] == 3) {
@@ -196,6 +200,7 @@ void Scene::updateEntities(int deltaTime)
 		case 5:
 			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
 				player->increaseScore();
+				showScore = 100;
 				entity.erase(entity.begin() + i);
 				entities.erase(entities.begin() + i);
 			}
@@ -217,8 +222,14 @@ void Scene::updateEntities(int deltaTime)
 			}*/
 			break;
 		case 11:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
+				player->trampoline();
+			}
 			break;
 		case 12:
+			if (entity[i]->collisionEntity(pos, glm::vec2(28, 28))) {
+				Game::instance().canviDestat();
+			}
 			break;
 		default:
 			break;
@@ -236,7 +247,7 @@ void Scene::render(int state)
 	modelview = glm::mat4(1.0f);
 	texProgram.setUniformMatrix4f("modelview", modelview);
 	texProgram.setUniform2f("texCoordDispl", 0.f, 0.f);
-
+	std::string message;
 	switch (state) {
 	case 0:			//Title
 		spritesheet_pantalla.loadFromFile("images/menu.png", TEXTURE_PIXEL_FORMAT_RGBA);
@@ -252,11 +263,20 @@ void Scene::render(int state)
 			sprite_credits->setPosition(glm::vec2(0, creditant));
 		}
 		sprite_credits->render();
+		message = "Final Score: ";
+		message += std::to_string(player->getScore());
+		text.render(message, glm::vec2(10, SCREEN_HEIGHT - 20), 32, glm::vec4(1, 0, 0, 1));
 		break;
 	default:
 		map->render();
 		player->render();
 		for (unsigned int i = 0;i < entity.size();i++) entity[i]->render();
+		if (showScore > 0) {
+			message = "Score: ";
+			message += std::to_string(player->getScore());
+			text.render(message, glm::vec2(10, SCREEN_HEIGHT - 20), 32, glm::vec4(1, 0, 0, 1));
+			showScore--;
+		}
 		break;
 	}
 }
