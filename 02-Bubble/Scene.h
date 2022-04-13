@@ -34,6 +34,16 @@ public:
 	bool getVulnerability();
 	void setInfinity_dash(bool d);
 	bool getInfinity_dash();
+	void shaking(int *shake, int *posPlayerx, int *posPlayery);
+
+	static Scene& instance()
+	{
+		static Scene S;
+
+		return S;
+	}
+
+	int state;
 
 private:
 	void initShaders();
