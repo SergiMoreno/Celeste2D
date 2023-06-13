@@ -4,4 +4,3 @@ University project about programming a 2D videogame using C++. All necessary ass
 ## Team members
 David Cano Cañardo [@Canicula656](https://github.com/Canicula656) \
 Sergio Moreno Pérez [@SergiMoreno](https://github.com/SergiMoreno) \
-Mark: 8
